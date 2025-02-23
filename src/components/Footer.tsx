@@ -1,13 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import {
-  Heart,
-  Facebook,
-  Instagram,
-  Twitter,
-  Mail,
-  Shield,
-  Home,
-} from "lucide-react";
+import { Link } from "react-router-dom";
+import { Facebook, Instagram, Twitter, Mail, Shield, Home } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -17,11 +9,11 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
-              <Home className="w-6 h-6 text-rose-500" />
+              <Home className="w-6 h-6 text-teal-500" />
               <span className="text-xl font-semibold">HiRentals</span>
             </Link>
             <p className="text-gray-600">
-              Connecting couples with their perfect wedding vendors.
+              Connecting renters with their perfect household items.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-gray-600">
@@ -42,9 +34,9 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* For Couples */}
+          {/* For Renters */}
           <div>
-            <h3 className="font-semibold mb-4">For Couples</h3>
+            <h3 className="font-semibold mb-4">For Renters</h3>
             <ul className="space-y-3">
               <li>
                 <Link
@@ -56,7 +48,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/couple/register"
+                  to="/renter/register"
                   className="text-gray-600 hover:text-primary"
                 >
                   Create Account
@@ -64,10 +56,10 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/saved-vendors"
+                  to="/saved-items"
                   className="text-gray-600 hover:text-primary"
                 >
-                  Saved Vendors
+                  Saved Items
                 </Link>
               </li>
               <li>
@@ -81,16 +73,16 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* For Vendors */}
+          {/* For Owners */}
           <div>
-            <h3 className="font-semibold mb-4">For Vendors</h3>
+            <h3 className="font-semibold mb-4">For Owners</h3>
             <ul className="space-y-3">
               <li>
                 <Link
-                  to="/vendor/register"
+                  to="/owner/register"
                   className="text-gray-600 hover:text-primary"
                 >
-                  List Your Business
+                  List Your Items
                 </Link>
               </li>
               <li>
@@ -103,18 +95,18 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/vendor/dashboard"
+                  to="/owner/dashboard"
                   className="text-gray-600 hover:text-primary"
                 >
-                  Vendor Dashboard
+                  Owner Dashboard
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/vendor/settings"
+                  to="/owner/settings"
                   className="text-gray-600 hover:text-primary"
                 >
-                  Business Settings
+                  Account Settings
                 </Link>
               </li>
             </ul>

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Heart,
-  Search,
-  MessageSquare,
-  UserCircle,
-  Bell,
-  Home,
-} from "lucide-react";
+import { Search, MessageSquare, UserCircle, Bell, Home } from "lucide-react";
 import { Button } from "./ui/button";
-import { supabase } from "../lib/supabase";
+import { auth, db } from "../firebase/firebase";
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 
 interface Notification {
   id: string;
@@ -20,51 +21,39 @@ interface Notification {
     | "booking"
     | "message"
     | "review"
-    | "vendor_response"
+    | "owner_response"
     | "booking_confirmation";
   entityId?: string; // ID of the related entity (booking, message, etc.)
 }
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [userRole, setUserRole] = useState<"vendor" | "couple" | null>(null);
+  const [userRole, setUserRole] = useState<"owner" | "renter" | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const checkUserRole = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user) {
         setUserRole(null);
         return;
       }
 
-      // Check if user is a vendor
-      const { data: vendorData } = await supabase
-        .from("vendors")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (vendorData) {
-        setUserRole("vendor");
-        loadVendorNotifications(user.id);
+      // Check if user is an owner
+      const ownerDoc = await getDoc(doc(db, "owners", user.uid));
+      if (ownerDoc.exists()) {
+        setUserRole("owner");
+        loadOwnerNotifications(user.uid);
         return;
       }
 
-      // Check if user is a couple
-      const { data: coupleData } = await supabase
-        .from("couples")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (coupleData) {
-        setUserRole("couple");
-        loadCoupleNotifications(user.id);
+      // Check if user is a renter
+      const renterDoc = await getDoc(doc(db, "renters", user.uid));
+      if (renterDoc.exists()) {
+        setUserRole("renter");
+        loadRenterNotifications(user.uid);
         return;
       }
 
@@ -73,79 +62,55 @@ const Navbar = () => {
 
     checkUserRole();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
+    const unsubscribe = auth.onAuthStateChanged(() => {
       checkUserRole();
     });
 
     return () => {
-      subscription.unsubscribe();
+      unsubscribe();
     };
   }, []);
 
-  const loadVendorNotifications = async (userId: string) => {
-    // Example notifications with types and entityIds
-    const mockNotifications = [
-      {
-        id: "1",
-        title: "New booking request from Sarah & Michael",
-        time: "2 hours ago",
-        read: false,
-        type: "booking" as const,
-        entityId: "booking123",
-      },
-      {
-        id: "2",
-        title: "Message received from Emma & James",
-        time: "5 hours ago",
-        read: false,
-        type: "message" as const,
-        entityId: "message456",
-      },
-      {
-        id: "3",
-        title: "New review posted",
-        time: "1 day ago",
-        read: true,
-        type: "review" as const,
-        entityId: "review789",
-      },
-    ];
-    setNotifications(mockNotifications);
-    setUnreadCount(mockNotifications.filter((n) => !n.read).length);
+  const loadOwnerNotifications = async (userId: string) => {
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("userId", "==", userId),
+      where("role", "==", "owner")
+    );
+
+    const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
+      const notificationsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Notification[];
+      setNotifications(notificationsData);
+      setUnreadCount(notificationsData.filter((n) => !n.read).length);
+    });
+
+    return () => {
+      unsubscribe();
+    };
   };
 
-  const loadCoupleNotifications = async (userId: string) => {
-    // Example notifications with types and entityIds
-    const mockNotifications = [
-      {
-        id: "1",
-        title: 'Vendor "Elegant Events" responded to your inquiry',
-        time: "1 hour ago",
-        read: false,
-        type: "vendor_response" as const,
-        entityId: "message123",
-      },
-      {
-        id: "2",
-        title: "New message from Dream Venue",
-        time: "3 hours ago",
-        read: false,
-        type: "message" as const,
-        entityId: "message456",
-      },
-      {
-        id: "3",
-        title: "Booking confirmed with Perfect Photography",
-        time: "1 day ago",
-        read: true,
-        type: "booking_confirmation" as const,
-        entityId: "booking789",
-      },
-    ];
-    setNotifications(mockNotifications);
-    setUnreadCount(mockNotifications.filter((n) => !n.read).length);
+  const loadRenterNotifications = async (userId: string) => {
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("userId", "==", userId),
+      where("role", "==", "renter")
+    );
+
+    const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
+      const notificationsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Notification[];
+      setNotifications(notificationsData);
+      setUnreadCount(notificationsData.filter((n) => !n.read).length);
+    });
+
+    return () => {
+      unsubscribe();
+    };
   };
 
   const handleMessagesClick = (e: React.MouseEvent) => {
@@ -176,7 +141,7 @@ const Navbar = () => {
         });
         break;
       case "message":
-      case "vendor_response":
+      case "owner_response":
         navigate(`/messages`, {
           state: {
             openConversation: notification.entityId,
@@ -203,7 +168,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <Home className="w-6 h-6 text-rose-500" />
+            <Home className="w-6 h-6 text-teal-500" />
             <span className="text-xl font-semibold">HiRentals</span>
           </Link>
 
@@ -300,9 +265,9 @@ const Navbar = () => {
                   )}
                 </div>
                 <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-                  {userRole === "vendor"
-                    ? "Vendor Dashboard"
-                    : "Couple Dashboard"}
+                  {userRole === "owner"
+                    ? "Owner Dashboard"
+                    : "Renter Dashboard"}
                 </Button>
               </div>
             )}

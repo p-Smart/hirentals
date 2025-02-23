@@ -168,25 +168,25 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ vendor }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
           {
-            icon: <Calendar className="w-6 h-6 text-rose-500" />,
+            icon: <Calendar className="w-6 h-6 text-teal-500" />,
             label: "Upcoming Appointments",
             value: appointmentsCount.toString(),
             onClick: () => navigate("/calendar"),
           },
           {
-            icon: <MessageSquare className="w-6 h-6 text-rose-500" />,
+            icon: <MessageSquare className="w-6 h-6 text-teal-500" />,
             label: "Unread Messages",
             value: unreadMessages.toString(),
             onClick: () => navigate("/messages"),
           },
           {
-            icon: <InboxIcon className="w-6 h-6 text-rose-500" />,
+            icon: <InboxIcon className="w-6 h-6 text-teal-500" />,
             label: "Pending Leads",
             value: pendingLeads.toString(),
             onClick: () => navigate("/leads"),
           },
           {
-            icon: <Home className="w-6 h-6 text-rose-500" />,
+            icon: <Home className="w-6 h-6 text-teal-500" />,
             label: "Profile Views",
             value: profileViews.toString(),
             onClick: () => navigate(`/vendors/${vendor.id}`),
@@ -254,7 +254,7 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ vendor }) => {
               key={index}
               className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg"
             >
-              <div className="w-2 h-2 rounded-full bg-rose-500" />
+              <div className="w-2 h-2 rounded-full bg-teal-500" />
               <div className="flex-1">
                 <p className="font-medium">{activity.title}</p>
                 <p className="text-sm text-gray-600">{activity.time}</p>
@@ -473,7 +473,7 @@ const CoupleDashboard: React.FC<CoupleDashboardProps> = ({ couple }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
           {
-            icon: <Calendar className="w-6 h-6 text-rose-500" />,
+            icon: <Calendar className="w-6 h-6 text-teal-500" />,
             label: "Days Until Wedding",
             value: couple.wedding_date
               ? Math.ceil(
@@ -485,13 +485,13 @@ const CoupleDashboard: React.FC<CoupleDashboardProps> = ({ couple }) => {
             onClick: () => navigate("/settings"),
           },
           {
-            icon: <MessageSquare className="w-6 h-6 text-rose-500" />,
+            icon: <MessageSquare className="w-6 h-6 text-teal-500" />,
             label: "Vendor Messages",
             value: inquiries.length,
             onClick: () => navigate("/messages"),
           },
           {
-            icon: <Home className="w-6 h-6 text-rose-500" />,
+            icon: <Home className="w-6 h-6 text-teal-500" />,
             label: "Saved Vendors",
             value: savedVendorsCount,
             onClick: () => navigate("/saved-vendors"),

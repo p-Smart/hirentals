@@ -7,14 +7,14 @@ const Home = () => {
     <div className="space-y-20">
       {/* Hero Section */}
       <section className="text-center space-y-8">
-        <h1 className="text-5xl font-bold text-gray-900">
-          Find Your Perfect Household Items for Rent
+        <h1 className="text-3xl md:text-5xl font-bold text-gray-900">
+          Discover Household Items for Rent
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Connect with trusted lenders who offer a variety of household items
-          for rent
+          Connect with trusted owners offering a variety of household items for
+          rent
         </p>
-        <div className="flex justify-center gap-4">
+        <div className="flex flex-col items-center gap-4 md:flex-row md:justify-center">
           <Link to="/vendors">
             <Button size="lg">Start Renting</Button>
           </Link>
@@ -31,17 +31,18 @@ const Home = () => {
         {[
           {
             image:
-              "https://unsplash.com/photos/brown-and-white-wooden-table-beside-sofa-chair-FBXuXp57eM0",
-            title: "Furniture",
-          },
-          {
-            image: "https://images.unsplash.com/photo-1560185127-6a8c6c8d5a6f",
-            title: "Electronics",
+              "https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            title: "Home Appliances",
           },
           {
             image:
-              "https://images.unsplash.com/photo-1593642634367-d91a135587b5",
-            title: "Appliances",
+              "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            title: "Furniture & Furnishings",
+          },
+          {
+            image:
+              "https://img.freepik.com/free-vector/home-theater-realistic-interior-template_1284-14928.jpg?t=st=1740291094~exp=1740294694~hmac=fa5e02dd3de0c3752b8ea95c727a0b222715c7d35cb15cf5c63d8f82ebc54803&w=1060",
+            title: "Electronics & Gadgets",
           },
         ].map((category) => (
           <div
@@ -49,7 +50,7 @@ const Home = () => {
             className="relative group overflow-hidden rounded-lg"
           >
             <img
-              src={`${category.image}?auto=format&fit=crop&w=800&q=80`}
+              src={`${category.image}`}
               alt={category.title}
               className="w-full h-64 object-cover transition-transform group-hover:scale-105"
             />
@@ -66,21 +67,21 @@ const Home = () => {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-12">
         {[
           {
-            icon: <Search className="w-8 h-8 text-rose-500" />,
+            icon: <Search className="w-8 h-8 text-teal-500" />,
             title: "Easy Search",
             description:
-              "Find and compare items based on your needs and budget",
+              "Find and compare household items based on your needs and budget",
           },
           {
-            icon: <Calendar className="w-8 h-8 text-rose-500" />,
+            icon: <Calendar className="w-8 h-8 text-teal-500" />,
             title: "Smart Booking",
-            description: "Schedule rentals and manage bookings in one place",
+            description: "Schedule rentals and manage bookings effortlessly",
           },
           {
-            icon: <MessageSquare className="w-8 h-8 text-rose-500" />,
+            icon: <MessageSquare className="w-8 h-8 text-teal-500" />,
             title: "Direct Communication",
             description:
-              "Chat with lenders and discuss your requirements seamlessly",
+              "Chat with owners and discuss your requirements seamlessly",
           },
         ].map((feature) => (
           <div key={feature.title} className="text-center space-y-4">

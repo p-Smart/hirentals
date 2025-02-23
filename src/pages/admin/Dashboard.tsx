@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Users2, Store, Star, DollarSign, Calendar } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import { supabase } from '../../lib/supabase';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Users2, Store, Star, DollarSign, Calendar } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { supabase } from "../../lib/supabase";
 
 interface Stats {
   totalVendors: number;
@@ -15,7 +15,7 @@ interface Stats {
 interface RecentMember {
   id: string;
   email: string;
-  role: 'vendor' | 'couple';
+  role: "vendor" | "couple";
   created_at: string;
   details?: {
     business_name?: string;
@@ -45,24 +45,24 @@ const AdminDashboard = () => {
     try {
       // Get total vendors
       const { count: vendorsCount } = await supabase
-        .from('vendors')
-        .select('*', { count: 'exact', head: true });
+        .from("vendors")
+        .select("*", { count: "exact", head: true });
 
       // Get total couples
       const { count: couplesCount } = await supabase
-        .from('couples')
-        .select('*', { count: 'exact', head: true });
+        .from("couples")
+        .select("*", { count: "exact", head: true });
 
       // Get total bookings
       const { count: bookingsCount } = await supabase
-        .from('bookings')
-        .select('*', { count: 'exact', head: true });
+        .from("bookings")
+        .select("*", { count: "exact", head: true });
 
       // Get active subscriptions
       const { count: subscriptionsCount } = await supabase
-        .from('vendors')
-        .select('*', { count: 'exact', head: true })
-        .not('subscription_plan', 'is', null);
+        .from("vendors")
+        .select("*", { count: "exact", head: true })
+        .not("subscription_plan", "is", null);
 
       setStats({
         totalVendors: vendorsCount || 0,
@@ -72,8 +72,8 @@ const AdminDashboard = () => {
         activeSubscriptions: subscriptionsCount || 0,
       });
     } catch (error) {
-      console.error('Error loading stats:', error);
-      toast.error('Failed to load dashboard statistics');
+      console.error("Error loading stats:", error);
+      toast.error("Failed to load dashboard statistics");
     }
   };
 
@@ -81,9 +81,9 @@ const AdminDashboard = () => {
     try {
       // Get recent users
       const { data: users, error: usersError } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false })
+        .from("users")
+        .select("*")
+        .order("created_at", { ascending: false })
         .limit(10);
 
       if (usersError) throw usersError;
@@ -96,30 +96,30 @@ const AdminDashboard = () => {
             email: user.email,
             role: user.role,
             created_at: user.created_at,
-            details: {}
+            details: {},
           };
 
-          if (user.role === 'vendor') {
+          if (user.role === "vendor") {
             const { data: vendorData } = await supabase
-              .from('vendors')
-              .select('business_name')
-              .eq('user_id', user.id)
+              .from("vendors")
+              .select("business_name")
+              .eq("user_id", user.id)
               .single();
-            
+
             if (vendorData) {
               member.details = { business_name: vendorData.business_name };
             }
-          } else if (user.role === 'couple') {
+          } else if (user.role === "couple") {
             const { data: coupleData } = await supabase
-              .from('couples')
-              .select('partner1_name, partner2_name')
-              .eq('user_id', user.id)
+              .from("couples")
+              .select("partner1_name, partner2_name")
+              .eq("user_id", user.id)
               .single();
-            
+
             if (coupleData) {
               member.details = {
                 partner1_name: coupleData.partner1_name,
-                partner2_name: coupleData.partner2_name
+                partner2_name: coupleData.partner2_name,
               };
             }
           }
@@ -130,8 +130,8 @@ const AdminDashboard = () => {
 
       setRecentMembers(enrichedMembers);
     } catch (error) {
-      console.error('Error loading recent members:', error);
-      toast.error('Failed to load recent members');
+      console.error("Error loading recent members:", error);
+      toast.error("Failed to load recent members");
     } finally {
       setLoading(false);
     }
@@ -139,20 +139,24 @@ const AdminDashboard = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
     }).format(date);
   };
 
   const getMemberName = (member: RecentMember) => {
-    if (member.role === 'vendor' && member.details?.business_name) {
+    if (member.role === "vendor" && member.details?.business_name) {
       return member.details.business_name;
-    } else if (member.role === 'couple' && member.details?.partner1_name && member.details?.partner2_name) {
+    } else if (
+      member.role === "couple" &&
+      member.details?.partner1_name &&
+      member.details?.partner2_name
+    ) {
       return `${member.details.partner1_name} & ${member.details.partner2_name}`;
     }
     return member.email;
@@ -171,38 +175,40 @@ const AdminDashboard = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Wedding Marketplace Statistics</h1>
-        <p className="text-gray-600">Overview of platform activity and growth</p>
+        <p className="text-gray-600">
+          Overview of platform activity and growth
+        </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
         {[
           {
-            label: 'Total Vendors',
+            label: "Total Vendors",
             value: stats.totalVendors,
             icon: <Store className="w-8 h-8 text-primary" />,
-            onClick: () => navigate('/admin/vendors')
+            onClick: () => navigate("/admin/vendors"),
           },
           {
-            label: 'Total Couples',
+            label: "Total Couples",
             value: stats.totalCouples,
-            icon: <Users2 className="w-8 h-8 text-primary" />
+            icon: <Users2 className="w-8 h-8 text-primary" />,
           },
           {
-            label: 'Total Bookings',
+            label: "Total Bookings",
             value: stats.totalBookings,
-            icon: <Star className="w-8 h-8 text-primary" />
+            icon: <Star className="w-8 h-8 text-primary" />,
           },
           {
-            label: 'Active Subscriptions',
+            label: "Active Subscriptions",
             value: stats.activeSubscriptions,
-            icon: <Store className="w-8 h-8 text-primary" />
+            icon: <Store className="w-8 h-8 text-primary" />,
           },
           {
-            label: 'Total Revenue',
+            label: "Total Revenue",
             value: `$${stats.totalRevenue.toLocaleString()}`,
-            icon: <DollarSign className="w-8 h-8 text-primary" />
-          }
+            icon: <DollarSign className="w-8 h-8 text-primary" />,
+          },
         ].map((stat, index) => (
           <button
             key={index}
@@ -235,13 +241,15 @@ const AdminDashboard = () => {
                 className="flex items-center justify-between py-3 border-b last:border-0"
               >
                 <div className="flex items-center space-x-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    member.role === 'vendor' ? 'bg-blue-100' : 'bg-rose-100'
-                  }`}>
-                    {member.role === 'vendor' ? (
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      member.role === "vendor" ? "bg-blue-100" : "bg-teal-100"
+                    }`}
+                  >
+                    {member.role === "vendor" ? (
                       <Store className={`w-5 h-5 text-blue-600`} />
                     ) : (
-                      <Users2 className={`w-5 h-5 text-rose-600`} />
+                      <Users2 className={`w-5 h-5 text-teal-600`} />
                     )}
                   </div>
                   <div>
@@ -250,11 +258,13 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <span className={`px-3 py-1 rounded-full text-sm ${
-                    member.role === 'vendor' 
-                      ? 'bg-blue-100 text-blue-800' 
-                      : 'bg-rose-100 text-rose-800'
-                  }`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm ${
+                      member.role === "vendor"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-teal-100 text-teal-800"
+                    }`}
+                  >
                     {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                   </span>
                   <span className="text-sm text-gray-500">

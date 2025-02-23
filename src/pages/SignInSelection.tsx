@@ -16,42 +16,42 @@ const SignInSelection = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-        {/* Couple Sign In */}
+        {/* Renter Sign In */}
         <div className="bg-white rounded-xl shadow-sm p-8 hover:shadow-md transition-shadow">
           <div className="flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
               <Users2 className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-2xl font-semibold mb-4">Couple Account</h2>
+            <h2 className="text-2xl font-semibold mb-4">Renter Account</h2>
             <p className="text-gray-600 mb-8">
-              Sign in to continue planning your perfect wedding day
+              Sign in to continue renting household items
             </p>
             <Button
               size="lg"
               className="w-full"
-              onClick={() => navigate("/couple/signin")}
+              onClick={() => navigate("/renter/signin")}
             >
-              Sign In as Couple
+              Sign In as Renter
             </Button>
           </div>
         </div>
 
-        {/* Vendor Sign In */}
+        {/* Owner Sign In */}
         <div className="bg-white rounded-xl shadow-sm p-8 hover:shadow-md transition-shadow">
           <div className="flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
               <Store className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-2xl font-semibold mb-4">Vendor Account</h2>
+            <h2 className="text-2xl font-semibold mb-4">Owner Account</h2>
             <p className="text-gray-600 mb-8">
-              Sign in to manage your business and connect with couples
+              Sign in to manage your items and connect with renters
             </p>
             <Button
               size="lg"
               className="w-full"
-              onClick={() => navigate("/vendor/signin")}
+              onClick={() => navigate("/owner/signin")}
             >
-              Sign In as Vendor
+              Sign In as Owner
             </Button>
           </div>
         </div>

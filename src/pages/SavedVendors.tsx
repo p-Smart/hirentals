@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Heart, MapPin, Star, Trash2 } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { supabase } from '../lib/supabase';
-import { toast } from 'react-hot-toast';
-import type { Vendor } from '../types';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Heart, MapPin, Star, Trash2 } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { supabase } from "../lib/supabase";
+import { toast } from "react-hot-toast";
+import type { Vendor } from "../types";
 
 interface SavedVendor extends Vendor {
   saved_at: string;
@@ -22,33 +22,39 @@ const SavedVendors = () => {
 
   const loadSavedVendors = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        toast.error('Please sign in to view saved vendors');
-        navigate('/couple/register');
+        toast.error("Please sign in to view saved vendors");
+        navigate("/renter/register");
         return;
       }
 
       const { data, error } = await supabase
-        .from('saved_vendors')
-        .select(`
+        .from("saved_vendors")
+        .select(
+          `
           saved_at,
           notes,
           vendors (*)
-        `)
-        .eq('couple_id', user.id)
-        .order('saved_at', { ascending: false });
+        `
+        )
+        .eq("couple_id", user.id)
+        .order("saved_at", { ascending: false });
 
       if (error) throw error;
 
-      setSavedVendors(data.map(item => ({
-        ...item.vendors,
-        saved_at: item.saved_at,
-        notes: item.notes
-      })));
+      setSavedVendors(
+        data.map((item) => ({
+          ...item.vendors,
+          saved_at: item.saved_at,
+          notes: item.notes,
+        }))
+      );
     } catch (error) {
-      console.error('Error loading saved vendors:', error);
-      toast.error('Failed to load saved vendors');
+      console.error("Error loading saved vendors:", error);
+      toast.error("Failed to load saved vendors");
     } finally {
       setLoading(false);
     }
@@ -56,22 +62,26 @@ const SavedVendors = () => {
 
   const removeFromSaved = async (vendorId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const { error } = await supabase
-        .from('saved_vendors')
+        .from("saved_vendors")
         .delete()
-        .eq('couple_id', user.id)
-        .eq('vendor_id', vendorId);
+        .eq("couple_id", user.id)
+        .eq("vendor_id", vendorId);
 
       if (error) throw error;
 
-      setSavedVendors(prev => prev.filter(vendor => vendor.id !== vendorId));
-      toast.success('Vendor removed from saved list');
+      setSavedVendors((prev) =>
+        prev.filter((vendor) => vendor.id !== vendorId)
+      );
+      toast.success("Vendor removed from saved list");
     } catch (error) {
-      console.error('Error removing vendor:', error);
-      toast.error('Failed to remove vendor');
+      console.error("Error removing vendor:", error);
+      toast.error("Failed to remove vendor");
     }
   };
 
@@ -93,9 +103,7 @@ const SavedVendors = () => {
           <p className="text-gray-600 mb-6">
             Start exploring vendors and save your favorites for later.
           </p>
-          <Button onClick={() => navigate('/vendors')}>
-            Browse Vendors
-          </Button>
+          <Button onClick={() => navigate("/vendors")}>Browse Vendors</Button>
         </div>
       </div>
     );
@@ -107,10 +115,16 @@ const SavedVendors = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {savedVendors.map((vendor) => (
-          <div key={vendor.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div
+            key={vendor.id}
+            className="bg-white rounded-lg shadow-sm overflow-hidden"
+          >
             <div className="relative h-48">
               <img
-                src={vendor.images[0] || `https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80`}
+                src={
+                  vendor.images[0] ||
+                  `https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80`
+                }
                 alt={vendor.business_name}
                 className="w-full h-full object-cover"
               />

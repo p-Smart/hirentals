@@ -1,10 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, DollarSign, Star, MessageSquare, Heart, Loader2, Globe, Facebook, Instagram, Youtube, Plus } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { supabase } from '../lib/supabase';
-import { toast } from 'react-hot-toast';
-import type { Vendor } from '../types';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Calendar,
+  MapPin,
+  DollarSign,
+  Star,
+  MessageSquare,
+  Heart,
+  Loader2,
+  Globe,
+  Facebook,
+  Instagram,
+  Youtube,
+  Plus,
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import { supabase } from "../lib/supabase";
+import { toast } from "react-hot-toast";
+import type { Vendor } from "../types";
 
 interface Review {
   id: string;
@@ -42,16 +55,16 @@ const VendorProfile = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewFormData, setReviewFormData] = useState({
     rating: 5,
-    content: ''
+    content: "",
   });
   const [leadFormData, setLeadFormData] = useState<LeadFormData>({
-    partner1Name: '',
-    partner2Name: '',
-    email: '',
-    phone: '',
-    date: '',
-    time: '',
-    message: ''
+    partner1Name: "",
+    partner2Name: "",
+    email: "",
+    phone: "",
+    date: "",
+    time: "",
+    message: "",
   });
 
   useEffect(() => {
@@ -65,16 +78,16 @@ const VendorProfile = () => {
       if (!id) return;
 
       const { data: vendor, error } = await supabase
-        .from('vendors')
-        .select('*')
-        .eq('id', id)
+        .from("vendors")
+        .select("*")
+        .eq("id", id)
         .single();
 
       if (error) throw error;
       setVendorData(vendor);
     } catch (error) {
-      console.error('Error loading vendor:', error);
-      toast.error('Failed to load vendor profile');
+      console.error("Error loading vendor:", error);
+      toast.error("Failed to load vendor profile");
     } finally {
       setLoading(false);
     }
@@ -85,37 +98,41 @@ const VendorProfile = () => {
       if (!id) return;
 
       const { data: reviewsData, error } = await supabase
-        .from('reviews')
-        .select(`
+        .from("reviews")
+        .select(
+          `
           *,
           couple:couples (
             partner1_name,
             partner2_name
           )
-        `)
-        .eq('vendor_id', id)
-        .order('created_at', { ascending: false });
+        `
+        )
+        .eq("vendor_id", id)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setReviews(reviewsData || []);
     } catch (error) {
-      console.error('Error loading reviews:', error);
+      console.error("Error loading reviews:", error);
     }
   };
 
   const checkUserAndSavedStatus = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user || !id) return;
 
       // Get couple ID
       const { data: coupleData, error: coupleError } = await supabase
-        .from('couples')
-        .select('id')
-        .eq('user_id', user.id)
+        .from("couples")
+        .select("id")
+        .eq("user_id", user.id)
         .maybeSingle();
 
-      if (coupleError && !coupleError.message.includes('contains 0 rows')) {
+      if (coupleError && !coupleError.message.includes("contains 0 rows")) {
         throw coupleError;
       }
 
@@ -124,63 +141,65 @@ const VendorProfile = () => {
 
         // Check if vendor is saved
         const { data: savedVendor, error: savedError } = await supabase
-          .from('saved_vendors')
-          .select('id')
-          .eq('couple_id', coupleData.id)
-          .eq('vendor_id', id)
+          .from("saved_vendors")
+          .select("id")
+          .eq("couple_id", coupleData.id)
+          .eq("vendor_id", id)
           .maybeSingle();
 
         if (savedError) throw savedError;
         setIsSaved(!!savedVendor);
       }
     } catch (error) {
-      console.error('Error checking saved status:', error);
+      console.error("Error checking saved status:", error);
     }
   };
 
   const toggleSave = async () => {
     try {
       setSavingFavorite(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        toast.error('Please sign in to save vendors');
-        navigate('/couple/register');
+        toast.error("Please sign in to save vendors");
+        navigate("/renter/register");
         return;
       }
 
       if (!coupleId) {
-        toast.error('Please create a couple profile to save vendors');
-        navigate('/couple/register');
+        toast.error("Please create a couple profile to save vendors");
+        navigate("/renter/register");
         return;
       }
 
       if (isSaved) {
         // Remove from saved
         const { error } = await supabase
-          .from('saved_vendors')
+          .from("saved_vendors")
           .delete()
-          .eq('couple_id', coupleId)
-          .eq('vendor_id', id);
+          .eq("couple_id", coupleId)
+          .eq("vendor_id", id);
 
         if (error) throw error;
-        toast.success('Removed from saved vendors');
+        toast.success("Removed from saved vendors");
       } else {
         // Add to saved
-        const { error } = await supabase
-          .from('saved_vendors')
-          .insert([{
+        const { error } = await supabase.from("saved_vendors").insert([
+          {
             couple_id: coupleId,
-            vendor_id: id
-          }]);
+            vendor_id: id,
+          },
+        ]);
 
         if (error) throw error;
-        toast.success('Added to saved vendors');
+        toast.success("Added to saved vendors");
       }
 
       setIsSaved(!isSaved);
     } catch (error) {
-      console.error('Error toggling save:', error);
-      toast.error('Failed to update saved vendors');
+      console.error("Error toggling save:", error);
+      toast.error("Failed to update saved vendors");
     } finally {
       setSavingFavorite(false);
     }
@@ -192,18 +211,20 @@ const VendorProfile = () => {
 
     try {
       setSubmittingLead(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        toast.error('Please sign in to send a message');
-        navigate('/couple/register');
+        toast.error("Please sign in to send a message");
+        navigate("/renter/register");
         return;
       }
 
       // Get vendor's user ID
       const { data: vendorUserData, error: vendorError } = await supabase
-        .from('vendors')
-        .select('user_id')
-        .eq('id', vendorData.id)
+        .from("vendors")
+        .select("user_id")
+        .eq("id", vendorData.id)
         .single();
 
       if (vendorError) throw vendorError;
@@ -223,31 +244,31 @@ Preferred Time: ${leadFormData.time}
 Message:
 ${leadFormData.message}`;
 
-      const { error: messageError } = await supabase
-        .from('messages')
-        .insert([{
+      const { error: messageError } = await supabase.from("messages").insert([
+        {
           sender_id: user.id,
           receiver_id: vendorUserData.user_id,
           content: message,
-          status: 'pending'
-        }]);
+          status: "pending",
+        },
+      ]);
 
       if (messageError) throw messageError;
 
-      toast.success('Message sent successfully!');
+      toast.success("Message sent successfully!");
       setShowLeadForm(false);
       setLeadFormData({
-        partner1Name: '',
-        partner2Name: '',
-        email: '',
-        phone: '',
-        date: '',
-        time: '',
-        message: ''
+        partner1Name: "",
+        partner2Name: "",
+        email: "",
+        phone: "",
+        date: "",
+        time: "",
+        message: "",
       });
     } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Failed to send message');
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message");
     } finally {
       setSubmittingLead(false);
     }
@@ -260,24 +281,24 @@ ${leadFormData.message}`;
     try {
       setSubmittingReview(true);
 
-      const { error } = await supabase
-        .from('reviews')
-        .insert([{
+      const { error } = await supabase.from("reviews").insert([
+        {
           vendor_id: vendorData.id,
           couple_id: coupleId,
           rating: reviewFormData.rating,
-          content: reviewFormData.content
-        }]);
+          content: reviewFormData.content,
+        },
+      ]);
 
       if (error) throw error;
 
-      toast.success('Review submitted successfully!');
+      toast.success("Review submitted successfully!");
       setShowReviewForm(false);
-      setReviewFormData({ rating: 5, content: '' });
+      setReviewFormData({ rating: 5, content: "" });
       loadReviews(); // Reload reviews to show the new one
     } catch (error) {
-      console.error('Error submitting review:', error);
-      toast.error('Failed to submit review');
+      console.error("Error submitting review:", error);
+      toast.error("Failed to submit review");
     } finally {
       setSubmittingReview(false);
     }
@@ -304,7 +325,10 @@ ${leadFormData.message}`;
       {/* Header */}
       <div className="relative h-80 rounded-xl overflow-hidden">
         <img
-          src={vendorData.images[0] || "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=80"}
+          src={
+            vendorData.images[0] ||
+            "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=80"
+          }
           alt={vendorData.business_name}
           className="w-full h-full object-cover"
         />
@@ -312,11 +336,15 @@ ${leadFormData.message}`;
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold mb-2">{vendorData.business_name}</h1>
+              <h1 className="text-3xl font-bold mb-2">
+                {vendorData.business_name}
+              </h1>
               <div className="flex items-center space-x-4">
                 <div className="flex items-center">
                   <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="ml-1">{vendorData.rating.toFixed(1)} ({reviews.length} reviews)</span>
+                  <span className="ml-1">
+                    {vendorData.rating.toFixed(1)} ({reviews.length} reviews)
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <MapPin className="w-5 h-5" />
@@ -337,7 +365,11 @@ ${leadFormData.message}`;
               {savingFavorite ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <Heart className={`w-5 h-5 ${isSaved ? 'fill-current text-red-500' : ''}`} />
+                <Heart
+                  className={`w-5 h-5 ${
+                    isSaved ? "fill-current text-red-500" : ""
+                  }`}
+                />
               )}
             </Button>
           </div>
@@ -401,8 +433,12 @@ ${leadFormData.message}`;
                       rel="noopener noreferrer"
                       className="flex items-center text-gray-600 hover:text-black"
                     >
-                      <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                      <svg
+                        className="w-5 h-5 mr-2"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                       </svg>
                       TikTok
                     </a>
@@ -457,9 +493,12 @@ ${leadFormData.message}`;
             </div>
 
             {showReviewForm && (
-              <form onSubmit={handleReviewSubmit} className="mb-8 bg-gray-50 rounded-lg p-4">
+              <form
+                onSubmit={handleReviewSubmit}
+                className="mb-8 bg-gray-50 rounded-lg p-4"
+              >
                 <h3 className="font-medium mb-4">Write a Review</h3>
-                
+
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Rating
@@ -469,12 +508,19 @@ ${leadFormData.message}`;
                       <button
                         key={star}
                         type="button"
-                        onClick={() => setReviewFormData(prev => ({ ...prev, rating: star }))}
+                        onClick={() =>
+                          setReviewFormData((prev) => ({
+                            ...prev,
+                            rating: star,
+                          }))
+                        }
                         className="text-yellow-400"
                       >
                         <Star
                           className={`w-8 h-8 ${
-                            star <= reviewFormData.rating ? 'fill-current' : 'stroke-current fill-none'
+                            star <= reviewFormData.rating
+                              ? "fill-current"
+                              : "stroke-current fill-none"
                           }`}
                         />
                       </button>
@@ -489,7 +535,12 @@ ${leadFormData.message}`;
                   <textarea
                     required
                     value={reviewFormData.content}
-                    onChange={(e) => setReviewFormData(prev => ({ ...prev, content: e.target.value }))}
+                    onChange={(e) =>
+                      setReviewFormData((prev) => ({
+                        ...prev,
+                        content: e.target.value,
+                      }))
+                    }
                     rows={4}
                     placeholder="Share your experience..."
                     className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
@@ -504,17 +555,14 @@ ${leadFormData.message}`;
                   >
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    disabled={submittingReview}
-                  >
+                  <Button type="submit" disabled={submittingReview}>
                     {submittingReview ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Submitting...
                       </>
                     ) : (
-                      'Submit Review'
+                      "Submit Review"
                     )}
                   </Button>
                 </div>
@@ -535,7 +583,9 @@ ${leadFormData.message}`;
                           <Star
                             key={i}
                             className={`w-4 h-4 ${
-                              i < review.rating ? 'fill-current' : 'stroke-current fill-none'
+                              i < review.rating
+                                ? "fill-current"
+                                : "stroke-current fill-none"
                             }`}
                           />
                         ))}
@@ -547,7 +597,8 @@ ${leadFormData.message}`;
                     <p className="text-gray-600">{review.content}</p>
                     {review.couple && (
                       <p className="text-sm font-medium mt-1">
-                        - {review.couple.partner1_name} & {review.couple.partner2_name}
+                        - {review.couple.partner1_name} &{" "}
+                        {review.couple.partner2_name}
                       </p>
                     )}
                   </div>
@@ -563,7 +614,7 @@ ${leadFormData.message}`;
             {showLeadForm ? (
               <form onSubmit={handleLeadFormSubmit} className="space-y-4">
                 <h3 className="font-semibold mb-4">Check Availability</h3>
-                
+
                 {/* Contact Details */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -574,7 +625,12 @@ ${leadFormData.message}`;
                       type="text"
                       required
                       value={leadFormData.partner1Name}
-                      onChange={(e) => setLeadFormData(prev => ({ ...prev, partner1Name: e.target.value }))}
+                      onChange={(e) =>
+                        setLeadFormData((prev) => ({
+                          ...prev,
+                          partner1Name: e.target.value,
+                        }))
+                      }
                       className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
@@ -586,7 +642,12 @@ ${leadFormData.message}`;
                       type="text"
                       required
                       value={leadFormData.partner2Name}
-                      onChange={(e) => setLeadFormData(prev => ({ ...prev, partner2Name: e.target.value }))}
+                      onChange={(e) =>
+                        setLeadFormData((prev) => ({
+                          ...prev,
+                          partner2Name: e.target.value,
+                        }))
+                      }
                       className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
@@ -601,7 +662,12 @@ ${leadFormData.message}`;
                       type="email"
                       required
                       value={leadFormData.email}
-                      onChange={(e) => setLeadFormData(prev => ({ ...prev, email: e.target.value }))}
+                      onChange={(e) =>
+                        setLeadFormData((prev) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
+                      }
                       className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
@@ -612,7 +678,12 @@ ${leadFormData.message}`;
                     <input
                       type="tel"
                       value={leadFormData.phone}
-                      onChange={(e) => setLeadFormData(prev => ({ ...prev, phone: e.target.value }))}
+                      onChange={(e) =>
+                        setLeadFormData((prev) => ({
+                          ...prev,
+                          phone: e.target.value,
+                        }))
+                      }
                       className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
@@ -628,8 +699,13 @@ ${leadFormData.message}`;
                       type="date"
                       required
                       value={leadFormData.date}
-                      onChange={(e) => setLeadFormData(prev => ({ ...prev, date: e.target.value }))}
-                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) =>
+                        setLeadFormData((prev) => ({
+                          ...prev,
+                          date: e.target.value,
+                        }))
+                      }
+                      min={new Date().toISOString().split("T")[0]}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
@@ -641,7 +717,12 @@ ${leadFormData.message}`;
                       type="time"
                       required
                       value={leadFormData.time}
-                      onChange={(e) => setLeadFormData(prev => ({ ...prev, time: e.target.value }))}
+                      onChange={(e) =>
+                        setLeadFormData((prev) => ({
+                          ...prev,
+                          time: e.target.value,
+                        }))
+                      }
                       className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
@@ -655,7 +736,12 @@ ${leadFormData.message}`;
                   <textarea
                     required
                     value={leadFormData.message}
-                    onChange={(e) => setLeadFormData(prev => ({ ...prev, message: e.target.value }))}
+                    onChange={(e) =>
+                      setLeadFormData((prev) => ({
+                        ...prev,
+                        message: e.target.value,
+                      }))
+                    }
                     rows={4}
                     placeholder="Tell us about your event..."
                     className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
@@ -683,18 +769,25 @@ ${leadFormData.message}`;
                         Sending...
                       </>
                     ) : (
-                      'Send Request'
+                      "Send Request"
                     )}
                   </Button>
                 </div>
               </form>
             ) : (
               <>
-                <Button className="w-full mb-3" onClick={() => setShowLeadForm(true)}>
+                <Button
+                  className="w-full mb-3"
+                  onClick={() => setShowLeadForm(true)}
+                >
                   <Calendar className="w-4 h-4 mr-2" />
                   Check Availability
                 </Button>
-                <Button variant="outline" className="w-full" onClick={() => navigate('/messages')}>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate("/messages")}
+                >
                   <MessageSquare className="w-4 h-4 mr-2" />
                   Message Vendor
                 </Button>

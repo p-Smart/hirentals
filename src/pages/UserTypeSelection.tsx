@@ -32,7 +32,7 @@ const UserTypeSelection = () => {
             <Button
               size="lg"
               className="w-full"
-              onClick={() => navigate("/couple/register")}
+              onClick={() => navigate("/renter/register")}
             >
               Create Couple Account
             </Button>

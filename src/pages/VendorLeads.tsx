@@ -1,9 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MessageSquare, Check, X, ArrowRight, Calendar, MapPin } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { supabase } from '../lib/supabase';
-import { toast } from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  MessageSquare,
+  Check,
+  X,
+  ArrowRight,
+  Calendar,
+  MapPin,
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import { supabase } from "../lib/supabase";
+import { toast } from "react-hot-toast";
 
 interface Lead {
   id: string;
@@ -14,14 +21,16 @@ interface Lead {
   wedding_date: string | null;
   last_message: string;
   created_at: string;
-  status: 'pending' | 'accepted' | 'declined' | 'closed';
+  status: "pending" | "accepted" | "declined" | "closed";
 }
 
 const VendorLeads = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'accepted' | 'declined' | 'closed'>('all');
+  const [filter, setFilter] = useState<
+    "all" | "pending" | "accepted" | "declined" | "closed"
+  >("all");
 
   useEffect(() => {
     loadLeads();
@@ -29,26 +38,30 @@ const VendorLeads = () => {
 
   const loadLeads = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        navigate('/vendor/signin');
+        navigate("/owner/signin");
         return;
       }
 
       // Get leads using the messages_with_couples view
       const { data: messagesData, error: messagesError } = await supabase
-        .from('messages_with_couples')
-        .select('*')
-        .eq('receiver_id', user.id)
-        .order('created_at', { ascending: false });
+        .from("messages_with_couples")
+        .select("*")
+        .eq("receiver_id", user.id)
+        .order("created_at", { ascending: false });
 
       if (messagesError) throw messagesError;
 
       // Process and deduplicate leads
       const processedLeads = messagesData
-        .filter(msg => msg.couple_id) // Filter out messages without couple data
+        .filter((msg) => msg.couple_id) // Filter out messages without couple data
         .reduce((acc: Lead[], msg) => {
-          const existingLead = acc.find(lead => lead.couple_id === msg.couple_id);
+          const existingLead = acc.find(
+            (lead) => lead.couple_id === msg.couple_id
+          );
           if (!existingLead) {
             acc.push({
               id: msg.id,
@@ -59,7 +72,7 @@ const VendorLeads = () => {
               wedding_date: msg.wedding_date,
               last_message: msg.content,
               created_at: msg.created_at,
-              status: msg.status
+              status: msg.status,
             });
           }
           return acc;
@@ -67,54 +80,57 @@ const VendorLeads = () => {
 
       setLeads(processedLeads);
     } catch (error) {
-      console.error('Error loading leads:', error);
-      toast.error('Failed to load leads');
+      console.error("Error loading leads:", error);
+      toast.error("Failed to load leads");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLeadAction = async (leadId: string, status: 'accepted' | 'declined') => {
+  const handleLeadAction = async (
+    leadId: string,
+    status: "accepted" | "declined"
+  ) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Update all messages in the conversation
       const { error } = await supabase
-        .from('messages')
+        .from("messages")
         .update({ status })
-        .eq('id', leadId);
+        .eq("id", leadId);
 
       if (error) throw error;
 
       // Update local state
-      setLeads(prev =>
-        prev.map(lead =>
-          lead.id === leadId ? { ...lead, status } : lead
-        )
+      setLeads((prev) =>
+        prev.map((lead) => (lead.id === leadId ? { ...lead, status } : lead))
       );
 
       toast.success(`Lead ${status} successfully`);
     } catch (error) {
-      console.error('Error updating lead:', error);
-      toast.error('Failed to update lead');
+      console.error("Error updating lead:", error);
+      toast.error("Failed to update lead");
     }
   };
 
-  const filteredLeads = leads.filter(lead => 
-    filter === 'all' ? true : lead.status === filter
+  const filteredLeads = leads.filter((lead) =>
+    filter === "all" ? true : lead.status === filter
   );
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'accepted':
-        return 'bg-green-100 text-green-800';
-      case 'declined':
-        return 'bg-red-100 text-red-800';
-      case 'closed':
-        return 'bg-gray-100 text-gray-800';
+      case "accepted":
+        return "bg-green-100 text-green-800";
+      case "declined":
+        return "bg-red-100 text-red-800";
+      case "closed":
+        return "bg-gray-100 text-gray-800";
       default:
-        return 'bg-yellow-100 text-yellow-800';
+        return "bg-yellow-100 text-yellow-800";
     }
   };
 
@@ -134,16 +150,18 @@ const VendorLeads = () => {
           <p className="text-gray-600">Manage your incoming leads</p>
         </div>
         <div className="flex gap-2">
-          {(['all', 'pending', 'accepted', 'declined', 'closed'] as const).map((status) => (
-            <Button
-              key={status}
-              variant={filter === status ? 'default' : 'outline'}
-              onClick={() => setFilter(status)}
-              className="capitalize"
-            >
-              {status}
-            </Button>
-          ))}
+          {(["all", "pending", "accepted", "declined", "closed"] as const).map(
+            (status) => (
+              <Button
+                key={status}
+                variant={filter === status ? "default" : "outline"}
+                onClick={() => setFilter(status)}
+                className="capitalize"
+              >
+                {status}
+              </Button>
+            )
+          )}
         </div>
       </div>
 
@@ -152,8 +170,8 @@ const VendorLeads = () => {
           <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold mb-2">No leads found</h2>
           <p className="text-gray-600">
-            {filter === 'all' 
-              ? 'When couples contact you, their inquiries will appear here.'
+            {filter === "all"
+              ? "When couples contact you, their inquiries will appear here."
               : `No ${filter} leads at the moment.`}
           </p>
         </div>
@@ -184,17 +202,21 @@ const VendorLeads = () => {
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-4">
-                  <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor(lead.status)}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm ${getStatusColor(
+                      lead.status
+                    )}`}
+                  >
                     {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
                   </span>
                   <div className="flex gap-2">
-                    {lead.status === 'pending' && (
+                    {lead.status === "pending" && (
                       <>
                         <Button
                           variant="outline"
                           size="sm"
                           className="text-red-600 hover:bg-red-50"
-                          onClick={() => handleLeadAction(lead.id, 'declined')}
+                          onClick={() => handleLeadAction(lead.id, "declined")}
                         >
                           <X className="w-4 h-4 mr-1" />
                           Decline
@@ -202,7 +224,7 @@ const VendorLeads = () => {
                         <Button
                           size="sm"
                           className="text-green-600 bg-green-100 hover:bg-green-200"
-                          onClick={() => handleLeadAction(lead.id, 'accepted')}
+                          onClick={() => handleLeadAction(lead.id, "accepted")}
                         >
                           <Check className="w-4 h-4 mr-1" />
                           Accept
@@ -212,7 +234,7 @@ const VendorLeads = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate('/messages')}
+                      onClick={() => navigate("/messages")}
                     >
                       View Messages
                       <ArrowRight className="w-4 h-4 ml-1" />

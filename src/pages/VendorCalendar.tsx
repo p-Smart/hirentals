@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Calendar as CalendarIcon, Clock, MapPin, Users2 } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { supabase } from '../lib/supabase';
-import { toast } from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Calendar as CalendarIcon, Clock, MapPin, Users2 } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { supabase } from "../lib/supabase";
+import { toast } from "react-hot-toast";
 
 interface Appointment {
   id: string;
@@ -12,7 +12,7 @@ interface Appointment {
   description: string;
   start_time: string;
   end_time: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: "pending" | "confirmed" | "cancelled";
   couple: {
     partner1_name: string;
     partner2_name: string;
@@ -25,7 +25,7 @@ const VendorCalendar = () => {
   const [loading, setLoading] = useState(true);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [view, setView] = useState<'list' | 'calendar'>('list');
+  const [view, setView] = useState<"list" | "calendar">("list");
 
   useEffect(() => {
     loadAppointments();
@@ -33,95 +33,100 @@ const VendorCalendar = () => {
 
   const loadAppointments = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        navigate('/vendor/signin');
+        navigate("/owner/signin");
         return;
       }
 
       // Get vendor ID
       const { data: vendorData } = await supabase
-        .from('vendors')
-        .select('id')
-        .eq('user_id', user.id)
+        .from("vendors")
+        .select("id")
+        .eq("user_id", user.id)
         .single();
 
       if (!vendorData) {
-        toast.error('Vendor profile not found');
+        toast.error("Vendor profile not found");
         return;
       }
 
       // Get appointments with couple details
       const { data: appointmentsData, error } = await supabase
-        .from('appointments')
-        .select(`
+        .from("appointments")
+        .select(
+          `
           *,
           couple:couples (
             partner1_name,
             partner2_name,
             location
           )
-        `)
-        .eq('vendor_id', vendorData.id)
-        .order('start_time', { ascending: true });
+        `
+        )
+        .eq("vendor_id", vendorData.id)
+        .order("start_time", { ascending: true });
 
       if (error) throw error;
 
       setAppointments(appointmentsData);
     } catch (error) {
-      console.error('Error loading appointments:', error);
-      toast.error('Failed to load appointments');
+      console.error("Error loading appointments:", error);
+      toast.error("Failed to load appointments");
     } finally {
       setLoading(false);
     }
   };
 
-  const updateAppointmentStatus = async (appointmentId: string, status: 'confirmed' | 'cancelled') => {
+  const updateAppointmentStatus = async (
+    appointmentId: string,
+    status: "confirmed" | "cancelled"
+  ) => {
     try {
       const { error } = await supabase
-        .from('appointments')
+        .from("appointments")
         .update({ status })
-        .eq('id', appointmentId);
+        .eq("id", appointmentId);
 
       if (error) throw error;
 
-      setAppointments(prev =>
-        prev.map(app =>
-          app.id === appointmentId ? { ...app, status } : app
-        )
+      setAppointments((prev) =>
+        prev.map((app) => (app.id === appointmentId ? { ...app, status } : app))
       );
 
       toast.success(`Appointment ${status}`);
     } catch (error) {
-      console.error('Error updating appointment:', error);
-      toast.error('Failed to update appointment');
+      console.error("Error updating appointment:", error);
+      toast.error("Failed to update appointment");
     }
   };
 
   const formatTime = (date: string) => {
-    return new Date(date).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
+    return new Date(date).toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
     });
   };
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric'
+    return new Date(date).toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
     });
   };
 
-  const getStatusColor = (status: Appointment['status']) => {
+  const getStatusColor = (status: Appointment["status"]) => {
     switch (status) {
-      case 'confirmed':
-        return 'bg-green-100 text-green-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
+      case "confirmed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-yellow-100 text-yellow-800';
+        return "bg-yellow-100 text-yellow-800";
     }
   };
 
@@ -142,14 +147,14 @@ const VendorCalendar = () => {
         </div>
         <div className="flex items-center space-x-4">
           <Button
-            variant={view === 'list' ? 'default' : 'outline'}
-            onClick={() => setView('list')}
+            variant={view === "list" ? "default" : "outline"}
+            onClick={() => setView("list")}
           >
             List View
           </Button>
           <Button
-            variant={view === 'calendar' ? 'default' : 'outline'}
-            onClick={() => setView('calendar')}
+            variant={view === "calendar" ? "default" : "outline"}
+            onClick={() => setView("calendar")}
           >
             Calendar View
           </Button>
@@ -173,7 +178,9 @@ const VendorCalendar = () => {
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">{appointment.title}</h3>
+                  <h3 className="text-xl font-semibold mb-2">
+                    {appointment.title}
+                  </h3>
                   <div className="space-y-2 text-gray-600">
                     <div className="flex items-center">
                       <CalendarIcon className="w-4 h-4 mr-2" />
@@ -181,11 +188,13 @@ const VendorCalendar = () => {
                     </div>
                     <div className="flex items-center">
                       <Clock className="w-4 h-4 mr-2" />
-                      {formatTime(appointment.start_time)} - {formatTime(appointment.end_time)}
+                      {formatTime(appointment.start_time)} -{" "}
+                      {formatTime(appointment.end_time)}
                     </div>
                     <div className="flex items-center">
                       <Users2 className="w-4 h-4 mr-2" />
-                      {appointment.couple.partner1_name} & {appointment.couple.partner2_name}
+                      {appointment.couple.partner1_name} &{" "}
+                      {appointment.couple.partner2_name}
                     </div>
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-2" />
@@ -193,25 +202,36 @@ const VendorCalendar = () => {
                     </div>
                   </div>
                   {appointment.description && (
-                    <p className="mt-4 text-gray-600">{appointment.description}</p>
+                    <p className="mt-4 text-gray-600">
+                      {appointment.description}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col items-end space-y-4">
-                  <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor(appointment.status)}`}>
-                    {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm ${getStatusColor(
+                      appointment.status
+                    )}`}
+                  >
+                    {appointment.status.charAt(0).toUpperCase() +
+                      appointment.status.slice(1)}
                   </span>
-                  {appointment.status === 'pending' && (
+                  {appointment.status === "pending" && (
                     <div className="flex space-x-2">
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => updateAppointmentStatus(appointment.id, 'cancelled')}
+                        onClick={() =>
+                          updateAppointmentStatus(appointment.id, "cancelled")
+                        }
                       >
                         Decline
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => updateAppointmentStatus(appointment.id, 'confirmed')}
+                        onClick={() =>
+                          updateAppointmentStatus(appointment.id, "confirmed")
+                        }
                       >
                         Confirm
                       </Button>

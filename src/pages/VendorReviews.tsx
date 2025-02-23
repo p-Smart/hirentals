@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Star, MessageSquare, Calendar } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { supabase } from '../lib/supabase';
-import { toast } from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Star, MessageSquare, Calendar } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { supabase } from "../lib/supabase";
+import { toast } from "react-hot-toast";
 
 interface Review {
   id: string;
@@ -23,7 +23,7 @@ const VendorReviews = () => {
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [responding, setResponding] = useState<string | null>(null);
-  const [response, setResponse] = useState('');
+  const [response, setResponse] = useState("");
 
   useEffect(() => {
     loadReviews();
@@ -31,45 +31,49 @@ const VendorReviews = () => {
 
   const loadReviews = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        navigate('/vendor/signin');
+        navigate("/owner/signin");
         return;
       }
 
       // Get vendor ID
       const { data: vendorData } = await supabase
-        .from('vendors')
-        .select('id')
-        .eq('user_id', user.id)
+        .from("vendors")
+        .select("id")
+        .eq("user_id", user.id)
         .single();
 
       if (!vendorData) {
-        toast.error('Vendor profile not found');
+        toast.error("Vendor profile not found");
         return;
       }
 
       // Get reviews with couple details
       const { data: reviewsData, error } = await supabase
-        .from('reviews')
-        .select(`
+        .from("reviews")
+        .select(
+          `
           *,
           couple:couples (
             partner1_name,
             partner2_name
           )
-        `)
-        .eq('vendor_id', vendorData.id)
-        .order('created_at', { ascending: false });
+        `
+        )
+        .eq("vendor_id", vendorData.id)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
       // Filter out reviews with null couple data
-      const validReviews = reviewsData?.filter(review => review.couple) || [];
+      const validReviews = reviewsData?.filter((review) => review.couple) || [];
       setReviews(validReviews);
     } catch (error) {
-      console.error('Error loading reviews:', error);
-      toast.error('Failed to load reviews');
+      console.error("Error loading reviews:", error);
+      toast.error("Failed to load reviews");
     } finally {
       setLoading(false);
     }
@@ -77,39 +81,39 @@ const VendorReviews = () => {
 
   const handleSubmitResponse = async (reviewId: string) => {
     if (!response.trim()) {
-      toast.error('Please enter a response');
+      toast.error("Please enter a response");
       return;
     }
 
     try {
       const { error } = await supabase
-        .from('reviews')
+        .from("reviews")
         .update({
           response: response.trim(),
-          response_date: new Date().toISOString()
+          response_date: new Date().toISOString(),
         })
-        .eq('id', reviewId);
+        .eq("id", reviewId);
 
       if (error) throw error;
 
-      setReviews(prev =>
-        prev.map(review =>
+      setReviews((prev) =>
+        prev.map((review) =>
           review.id === reviewId
             ? {
                 ...review,
                 response: response.trim(),
-                response_date: new Date().toISOString()
+                response_date: new Date().toISOString(),
               }
             : review
         )
       );
 
       setResponding(null);
-      setResponse('');
-      toast.success('Response posted successfully');
+      setResponse("");
+      toast.success("Response posted successfully");
     } catch (error) {
-      console.error('Error posting response:', error);
-      toast.error('Failed to post response');
+      console.error("Error posting response:", error);
+      toast.error("Failed to post response");
     }
   };
 
@@ -132,27 +136,34 @@ const VendorReviews = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Reviews & Ratings</h1>
-        <p className="text-gray-600">Manage and respond to your customer reviews</p>
+        <p className="text-gray-600">
+          Manage and respond to your customer reviews
+        </p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {[
           {
-            label: 'Average Rating',
+            label: "Average Rating",
             value: getAverageRating(),
-            icon: <Star className="w-6 h-6 text-yellow-400" />
+            icon: <Star className="w-6 h-6 text-yellow-400" />,
           },
           {
-            label: 'Total Reviews',
+            label: "Total Reviews",
             value: reviews.length,
-            icon: <MessageSquare className="w-6 h-6 text-primary" />
+            icon: <MessageSquare className="w-6 h-6 text-primary" />,
           },
           {
-            label: 'Response Rate',
-            value: `${Math.round((reviews.filter(r => r.response).length / reviews.length) * 100) || 0}%`,
-            icon: <Calendar className="w-6 h-6 text-green-500" />
-          }
+            label: "Response Rate",
+            value: `${
+              Math.round(
+                (reviews.filter((r) => r.response).length / reviews.length) *
+                  100
+              ) || 0
+            }%`,
+            icon: <Calendar className="w-6 h-6 text-green-500" />,
+          },
         ].map((stat, index) => (
           <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
             <div className="flex items-center space-x-4">
@@ -189,7 +200,9 @@ const VendorReviews = () => {
                           <Star
                             key={i}
                             className={`w-5 h-5 ${
-                              i < review.rating ? 'fill-current' : 'stroke-current fill-none'
+                              i < review.rating
+                                ? "fill-current"
+                                : "stroke-current fill-none"
                             }`}
                           />
                         ))}
@@ -200,7 +213,8 @@ const VendorReviews = () => {
                     </div>
                     {review.couple && (
                       <p className="font-medium mt-1">
-                        {review.couple.partner1_name} & {review.couple.partner2_name}
+                        {review.couple.partner1_name} &{" "}
+                        {review.couple.partner2_name}
                       </p>
                     )}
                   </div>
@@ -215,7 +229,8 @@ const VendorReviews = () => {
                     <p className="font-medium mb-2">Your Response</p>
                     <p className="text-gray-600">{review.response}</p>
                     <p className="text-sm text-gray-500 mt-2">
-                      Responded on {new Date(review.response_date!).toLocaleDateString()}
+                      Responded on{" "}
+                      {new Date(review.response_date!).toLocaleDateString()}
                     </p>
                   </div>
                 ) : responding === review.id ? (
@@ -232,7 +247,7 @@ const VendorReviews = () => {
                         variant="outline"
                         onClick={() => {
                           setResponding(null);
-                          setResponse('');
+                          setResponse("");
                         }}
                       >
                         Cancel

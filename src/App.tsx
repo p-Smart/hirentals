@@ -11,7 +11,6 @@ import Messages from "./pages/Messages";
 import VendorRegister from "./pages/VendorRegister";
 import VendorSignIn from "./pages/VendorSignIn";
 import CoupleRegister from "./pages/CoupleRegister";
-import CoupleSignIn from "./pages/CoupleSignIn";
 import SignInSelection from "./pages/SignInSelection";
 import UserTypeSelection from "./pages/UserTypeSelection";
 import Checkout from "./pages/Checkout";
@@ -24,6 +23,8 @@ import VendorReviews from "./pages/VendorReviews";
 import VendorLeads from "./pages/VendorLeads";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminVendors from "./pages/admin/Vendors";
+import RenterSignIn from "./pages/RenterSignIn";
+import RenterRegister from "./pages/RenterRegister";
 
 function App() {
   return (
@@ -49,9 +50,9 @@ function App() {
             <Route path="/get-started" element={<UserTypeSelection />} />
             <Route path="/signin" element={<SignInSelection />} />
             <Route path="/vendor/register" element={<VendorRegister />} />
-            <Route path="/vendor/signin" element={<VendorSignIn />} />
-            <Route path="/couple/register" element={<CoupleRegister />} />
-            <Route path="/couple/signin" element={<CoupleSignIn />} />
+            <Route path="/owner/signin" element={<VendorSignIn />} />
+            <Route path="/renter/register" element={<RenterRegister />} />
+            <Route path="/renter/signin" element={<RenterSignIn />} />
 
             {/* Public Admin Dashboard */}
             <Route path="/admin/dashboard" element={<AdminDashboard />} />

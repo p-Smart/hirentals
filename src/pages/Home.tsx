@@ -18,7 +18,7 @@ const Home = () => {
           <Link to="/vendors">
             <Button size="lg">Start Renting</Button>
           </Link>
-          <Link to="/vendor/register">
+          <Link to="/owner/register">
             <Button size="lg" variant="outline">
               List Your Items
             </Button>
@@ -102,13 +102,13 @@ const Home = () => {
             {
               quote:
                 "Found the perfect furniture for our temporary stay. The platform made everything so easy!",
-              author: "John & Jane",
+              author: "Mobolaji O.",
               rating: 5,
             },
             {
               quote:
                 "The comparison feature helped us find the best deals within our budget.",
-              author: "Alice & Bob",
+              author: "Daniel Ajayi",
               rating: 5,
             },
           ].map((testimonial) => (

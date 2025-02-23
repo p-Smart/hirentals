@@ -1,10 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import { Save, Loader2, Upload, X, Image as ImageIcon, Star, Globe, Facebook, Instagram, Youtube } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { supabase } from '../lib/supabase';
-import CitySelect from '../components/CitySelect';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import {
+  Save,
+  Loader2,
+  Upload,
+  X,
+  Image as ImageIcon,
+  Star,
+  Globe,
+  Facebook,
+  Instagram,
+  Youtube,
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import { supabase } from "../lib/supabase";
+import CitySelect from "../components/CitySelect";
 
 interface VendorFormData {
   businessName: string;
@@ -27,68 +38,70 @@ const VendorSettings = () => {
   const [images, setImages] = useState<string[]>([]);
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [formData, setFormData] = useState<VendorFormData>({
-    businessName: '',
-    category: '',
-    description: '',
-    location: '',
-    priceRange: '',
-    websiteUrl: '',
-    facebookUrl: '',
-    instagramUrl: '',
-    tiktokUrl: '',
-    youtubeUrl: '',
+    businessName: "",
+    category: "",
+    description: "",
+    location: "",
+    priceRange: "",
+    websiteUrl: "",
+    facebookUrl: "",
+    instagramUrl: "",
+    tiktokUrl: "",
+    youtubeUrl: "",
   });
 
   useEffect(() => {
     const loadVendorData = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) {
-          toast.error('Please sign in to access settings');
-          navigate('/vendor/register');
+          toast.error("Please sign in to access settings");
+          navigate("/owner/register");
           return;
         }
 
         // Load vendor data
         const { data: vendorData, error: vendorError } = await supabase
-          .from('vendors')
-          .select('*')
-          .eq('user_id', user.id)
+          .from("vendors")
+          .select("*")
+          .eq("user_id", user.id)
           .maybeSingle();
 
         if (vendorError) {
-          console.error('Error loading vendor data:', vendorError);
-          toast.error('Failed to load your profile');
+          console.error("Error loading vendor data:", vendorError);
+          toast.error("Failed to load your profile");
           return;
         }
 
         if (vendorData) {
           setFormData({
-            businessName: vendorData.business_name || '',
-            category: vendorData.category || '',
-            description: vendorData.description || '',
-            location: vendorData.location || '',
-            priceRange: vendorData.price_range || '$$$',
-            websiteUrl: vendorData.website_url || '',
-            facebookUrl: vendorData.facebook_url || '',
-            instagramUrl: vendorData.instagram_url || '',
-            tiktokUrl: vendorData.tiktok_url || '',
-            youtubeUrl: vendorData.youtube_url || '',
+            businessName: vendorData.business_name || "",
+            category: vendorData.category || "",
+            description: vendorData.description || "",
+            location: vendorData.location || "",
+            priceRange: vendorData.price_range || "$$$",
+            websiteUrl: vendorData.website_url || "",
+            facebookUrl: vendorData.facebook_url || "",
+            instagramUrl: vendorData.instagram_url || "",
+            tiktokUrl: vendorData.tiktok_url || "",
+            youtubeUrl: vendorData.youtube_url || "",
           });
 
           // Load service areas
           const { data: serviceAreas } = await supabase
-            .from('vendor_service_areas')
-            .select('city_id')
-            .eq('vendor_id', vendorData.id);
+            .from("vendor_service_areas")
+            .select("city_id")
+            .eq("vendor_id", vendorData.id);
 
           if (serviceAreas) {
-            setSelectedCities(serviceAreas.map(area => area.city_id));
+            setSelectedCities(serviceAreas.map((area) => area.city_id));
           }
         }
       } catch (error) {
-        console.error('Error loading vendor data:', error);
-        toast.error('Failed to load your profile');
+        console.error("Error loading vendor data:", error);
+        toast.error("Failed to load your profile");
       } finally {
         setLoading(false);
       }
@@ -97,10 +110,14 @@ const VendorSettings = () => {
     loadVendorData();
   }, [navigate]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -109,21 +126,23 @@ const VendorSettings = () => {
     setSaving(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
 
       // Get vendor ID
       const { data: vendorData } = await supabase
-        .from('vendors')
-        .select('id')
-        .eq('user_id', user.id)
+        .from("vendors")
+        .select("id")
+        .eq("user_id", user.id)
         .single();
 
-      if (!vendorData) throw new Error('Vendor not found');
+      if (!vendorData) throw new Error("Vendor not found");
 
       // Update vendor profile
       const { error: vendorError } = await supabase
-        .from('vendors')
+        .from("vendors")
         .update({
           business_name: formData.businessName,
           category: formData.category,
@@ -136,35 +155,35 @@ const VendorSettings = () => {
           tiktok_url: formData.tiktokUrl,
           youtube_url: formData.youtubeUrl,
         })
-        .eq('user_id', user.id);
+        .eq("user_id", user.id);
 
       if (vendorError) throw vendorError;
 
       // Update service areas
       const { error: deleteError } = await supabase
-        .from('vendor_service_areas')
+        .from("vendor_service_areas")
         .delete()
-        .eq('vendor_id', vendorData.id);
+        .eq("vendor_id", vendorData.id);
 
       if (deleteError) throw deleteError;
 
       if (selectedCities.length > 0) {
         const { error: insertError } = await supabase
-          .from('vendor_service_areas')
+          .from("vendor_service_areas")
           .insert(
-            selectedCities.map(cityId => ({
+            selectedCities.map((cityId) => ({
               vendor_id: vendorData.id,
-              city_id: cityId
+              city_id: cityId,
             }))
           );
 
         if (insertError) throw insertError;
       }
 
-      toast.success('Settings updated successfully');
+      toast.success("Settings updated successfully");
     } catch (error) {
-      console.error('Error updating settings:', error);
-      toast.error('Failed to update settings');
+      console.error("Error updating settings:", error);
+      toast.error("Failed to update settings");
     } finally {
       setSaving(false);
     }
@@ -189,7 +208,10 @@ const VendorSettings = () => {
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="space-y-4">
             <div>
-              <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="businessName"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Business Name
               </label>
               <input
@@ -204,7 +226,10 @@ const VendorSettings = () => {
             </div>
 
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Category
               </label>
               <select
@@ -226,7 +251,10 @@ const VendorSettings = () => {
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Business Description
               </label>
               <textarea
@@ -241,7 +269,10 @@ const VendorSettings = () => {
             </div>
 
             <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="location"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Location
               </label>
               <input
@@ -266,7 +297,10 @@ const VendorSettings = () => {
             </div>
 
             <div>
-              <label htmlFor="priceRange" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="priceRange"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Price Range
               </label>
               <select
@@ -286,11 +320,16 @@ const VendorSettings = () => {
 
             {/* Social Links Section */}
             <div className="border-t pt-6 mt-6">
-              <h3 className="text-lg font-medium mb-4">Website & Social Media</h3>
-              
+              <h3 className="text-lg font-medium mb-4">
+                Website & Social Media
+              </h3>
+
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="websiteUrl" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="websiteUrl"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     <div className="flex items-center">
                       <Globe className="w-4 h-4 mr-2" />
                       Website URL
@@ -308,7 +347,10 @@ const VendorSettings = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="facebookUrl" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="facebookUrl"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     <div className="flex items-center">
                       <Facebook className="w-4 h-4 mr-2" />
                       Facebook URL
@@ -326,7 +368,10 @@ const VendorSettings = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="instagramUrl" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="instagramUrl"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     <div className="flex items-center">
                       <Instagram className="w-4 h-4 mr-2" />
                       Instagram URL
@@ -344,10 +389,17 @@ const VendorSettings = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="tiktokUrl" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="tiktokUrl"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                      <svg
+                        className="w-4 h-4 mr-2"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                       </svg>
                       TikTok URL
                     </div>
@@ -364,7 +416,10 @@ const VendorSettings = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="youtubeUrl" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="youtubeUrl"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     <div className="flex items-center">
                       <Youtube className="w-4 h-4 mr-2" />
                       YouTube URL
@@ -388,7 +443,7 @@ const VendorSettings = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate("/dashboard")}
             >
               Cancel
             </Button>

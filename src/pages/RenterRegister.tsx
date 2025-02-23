@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { auth, db } from "../firebase/firebase";
 import {
@@ -186,15 +186,17 @@ const RenterRegister = () => {
           </Button>
 
           <div className="text-center mt-4">
-            <button
-              type="button"
-              onClick={() => setIsSignIn(!isSignIn)}
-              className="text-primary hover:underline"
-            >
-              {isSignIn
-                ? "Don't have an account? Create one"
-                : "Already have an account? Sign in"}
-            </button>
+            <Link to="/renter/signin">
+              <button
+                type="button"
+                onClick={() => setIsSignIn(!isSignIn)}
+                className="text-primary hover:underline"
+              >
+                {isSignIn
+                  ? "Don't have an account? Create one"
+                  : "Already have an account? Sign in"}
+              </button>
+            </Link>
           </div>
         </form>
       </div>

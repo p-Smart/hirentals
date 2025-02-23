@@ -8,9 +8,6 @@ import VendorProfile from "./pages/VendorProfile";
 import Dashboard from "./pages/Dashboard";
 import VendorSubscription from "./pages/VendorSubscription";
 import Messages from "./pages/Messages";
-import VendorRegister from "./pages/VendorRegister";
-import VendorSignIn from "./pages/VendorSignIn";
-import CoupleRegister from "./pages/CoupleRegister";
 import SignInSelection from "./pages/SignInSelection";
 import UserTypeSelection from "./pages/UserTypeSelection";
 import Checkout from "./pages/Checkout";
@@ -25,6 +22,8 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminVendors from "./pages/admin/Vendors";
 import RenterSignIn from "./pages/RenterSignIn";
 import RenterRegister from "./pages/RenterRegister";
+import OwnerRegister from "./pages/OwnerRegister";
+import OwnerSignIn from "./pages/OwnerSignIn";
 
 function App() {
   return (
@@ -49,8 +48,8 @@ function App() {
             <Route path="/leads" element={<VendorLeads />} />
             <Route path="/get-started" element={<UserTypeSelection />} />
             <Route path="/signin" element={<SignInSelection />} />
-            <Route path="/vendor/register" element={<VendorRegister />} />
-            <Route path="/owner/signin" element={<VendorSignIn />} />
+            <Route path="/owner/register" element={<OwnerRegister />} />
+            <Route path="/owner/signin" element={<OwnerSignIn />} />
             <Route path="/renter/register" element={<RenterRegister />} />
             <Route path="/renter/signin" element={<RenterSignIn />} />
 

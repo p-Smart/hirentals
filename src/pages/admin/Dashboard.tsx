@@ -2,140 +2,124 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Users2, Store, Star, DollarSign, Calendar } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { supabase } from "../../lib/supabase";
+import Pagination from "../../components/Pagination";
+import usePagination from "../../hooks/usePagination";
 
 interface Stats {
-  totalVendors: number;
-  totalCouples: number;
+  totalOwners: number;
+  totalRenters: number;
   totalBookings: number;
   totalRevenue: number;
-  activeSubscriptions: number;
+  activeListings: number;
 }
 
 interface RecentMember {
   id: string;
   email: string;
-  role: "vendor" | "couple";
+  role: "owner" | "renter";
   created_at: string;
   details?: {
-    business_name?: string;
-    partner1_name?: string;
-    partner2_name?: string;
+    fullName?: string;
   };
 }
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+
   const [stats, setStats] = useState<Stats>({
-    totalVendors: 0,
-    totalCouples: 0,
-    totalBookings: 0,
-    totalRevenue: 0,
-    activeSubscriptions: 0,
+    totalOwners: 50,
+    totalRenters: 200,
+    totalBookings: 150,
+    totalRevenue: 2000000,
+    activeListings: 120,
   });
-  const [recentMembers, setRecentMembers] = useState<RecentMember[]>([]);
+
+  const recentMembersData = [
+    {
+      id: "1",
+      email: "owner1@example.com",
+      role: "owner",
+      created_at: "2023-10-01T12:00:00Z",
+      details: { fullName: "John Doe" },
+    },
+    {
+      id: "2",
+      email: "renter1@example.com",
+      role: "renter",
+      created_at: "2023-10-02T14:30:00Z",
+      details: { fullName: "Jane Smith" },
+    },
+    {
+      id: "3",
+      email: "owner2@example.com",
+      role: "owner",
+      created_at: "2023-10-03T09:45:00Z",
+      details: { fullName: "Alice Johnson" },
+    },
+    {
+      id: "4",
+      email: "renter2@example.com",
+      role: "renter",
+      created_at: "2023-10-04T11:00:00Z",
+      details: { fullName: "Bob Brown" },
+    },
+    {
+      id: "5",
+      email: "owner3@example.com",
+      role: "owner",
+      created_at: "2023-10-05T08:15:00Z",
+      details: { fullName: "Charlie Davis" },
+    },
+    {
+      id: "6",
+      email: "renter3@example.com",
+      role: "renter",
+      created_at: "2023-10-06T10:45:00Z",
+      details: { fullName: "Diana Evans" },
+    },
+    {
+      id: "7",
+      email: "owner4@example.com",
+      role: "owner",
+      created_at: "2023-10-07T09:30:00Z",
+      details: { fullName: "Eve Foster" },
+    },
+    {
+      id: "8",
+      email: "renter4@example.com",
+      role: "renter",
+      created_at: "2023-10-08T12:45:00Z",
+      details: { fullName: "Frank Green" },
+    },
+    {
+      id: "9",
+      email: "owner5@example.com",
+      role: "owner",
+      created_at: "2023-10-09T14:00:00Z",
+      details: { fullName: "Grace Harris" },
+    },
+    {
+      id: "10",
+      email: "renter5@example.com",
+      role: "renter",
+      created_at: "2023-10-10T16:30:00Z",
+      details: { fullName: "Hank Irving" },
+    },
+  ];
+
+  const [recentMembers, setRecentMembers] = useState<RecentMember[]>(
+    recentMembersData as any
+  );
+
+  const { currentPage, goToPage, totalPages, startIndex, endIndex } =
+    usePagination({
+      totalItems: recentMembersData.length,
+    });
 
   useEffect(() => {
-    loadStats();
-    loadRecentMembers();
+    setLoading(false);
   }, []);
-
-  const loadStats = async () => {
-    try {
-      // Get total vendors
-      const { count: vendorsCount } = await supabase
-        .from("vendors")
-        .select("*", { count: "exact", head: true });
-
-      // Get total couples
-      const { count: couplesCount } = await supabase
-        .from("couples")
-        .select("*", { count: "exact", head: true });
-
-      // Get total bookings
-      const { count: bookingsCount } = await supabase
-        .from("bookings")
-        .select("*", { count: "exact", head: true });
-
-      // Get active subscriptions
-      const { count: subscriptionsCount } = await supabase
-        .from("vendors")
-        .select("*", { count: "exact", head: true })
-        .not("subscription_plan", "is", null);
-
-      setStats({
-        totalVendors: vendorsCount || 0,
-        totalCouples: couplesCount || 0,
-        totalBookings: bookingsCount || 0,
-        totalRevenue: 0, // This would need to be calculated from actual payment data
-        activeSubscriptions: subscriptionsCount || 0,
-      });
-    } catch (error) {
-      console.error("Error loading stats:", error);
-      toast.error("Failed to load dashboard statistics");
-    }
-  };
-
-  const loadRecentMembers = async () => {
-    try {
-      // Get recent users
-      const { data: users, error: usersError } = await supabase
-        .from("users")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      if (usersError) throw usersError;
-
-      // Get additional details for each user
-      const enrichedMembers = await Promise.all(
-        users.map(async (user) => {
-          const member: RecentMember = {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-            created_at: user.created_at,
-            details: {},
-          };
-
-          if (user.role === "vendor") {
-            const { data: vendorData } = await supabase
-              .from("vendors")
-              .select("business_name")
-              .eq("user_id", user.id)
-              .single();
-
-            if (vendorData) {
-              member.details = { business_name: vendorData.business_name };
-            }
-          } else if (user.role === "couple") {
-            const { data: coupleData } = await supabase
-              .from("couples")
-              .select("partner1_name, partner2_name")
-              .eq("user_id", user.id)
-              .single();
-
-            if (coupleData) {
-              member.details = {
-                partner1_name: coupleData.partner1_name,
-                partner2_name: coupleData.partner2_name,
-              };
-            }
-          }
-
-          return member;
-        })
-      );
-
-      setRecentMembers(enrichedMembers);
-    } catch (error) {
-      console.error("Error loading recent members:", error);
-      toast.error("Failed to load recent members");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -150,14 +134,8 @@ const AdminDashboard = () => {
   };
 
   const getMemberName = (member: RecentMember) => {
-    if (member.role === "vendor" && member.details?.business_name) {
-      return member.details.business_name;
-    } else if (
-      member.role === "couple" &&
-      member.details?.partner1_name &&
-      member.details?.partner2_name
-    ) {
-      return `${member.details.partner1_name} & ${member.details.partner2_name}`;
+    if (member.details?.fullName) {
+      return member.details.fullName;
     }
     return member.email;
   };
@@ -174,7 +152,7 @@ const AdminDashboard = () => {
     <div className="max-w-6xl mx-auto py-8 px-4">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Wedding Marketplace Statistics</h1>
+        <h1 className="text-3xl font-bold">Rental Marketplace Statistics</h1>
         <p className="text-gray-600">
           Overview of platform activity and growth
         </p>
@@ -184,14 +162,14 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
         {[
           {
-            label: "Total Vendors",
-            value: stats.totalVendors,
+            label: "Total Owners",
+            value: stats.totalOwners,
             icon: <Store className="w-8 h-8 text-primary" />,
-            onClick: () => navigate("/admin/vendors"),
+            onClick: () => navigate("/admin/owners"),
           },
           {
-            label: "Total Couples",
-            value: stats.totalCouples,
+            label: "Total Renters",
+            value: stats.totalRenters,
             icon: <Users2 className="w-8 h-8 text-primary" />,
           },
           {
@@ -200,13 +178,13 @@ const AdminDashboard = () => {
             icon: <Star className="w-8 h-8 text-primary" />,
           },
           {
-            label: "Active Subscriptions",
-            value: stats.activeSubscriptions,
+            label: "Active Listings",
+            value: stats.activeListings,
             icon: <Store className="w-8 h-8 text-primary" />,
           },
           {
             label: "Total Revenue",
-            value: `$${stats.totalRevenue.toLocaleString()}`,
+            value: `₦${stats.totalRevenue.toLocaleString()}`,
             icon: <DollarSign className="w-8 h-8 text-primary" />,
           },
         ].map((stat, index) => (
@@ -235,7 +213,7 @@ const AdminDashboard = () => {
               No recent members to display
             </p>
           ) : (
-            recentMembers.map((member) => (
+            recentMembers.slice(startIndex, endIndex).map((member) => (
               <div
                 key={member.id}
                 className="flex items-center justify-between py-3 border-b last:border-0"
@@ -243,10 +221,10 @@ const AdminDashboard = () => {
                 <div className="flex items-center space-x-4">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      member.role === "vendor" ? "bg-blue-100" : "bg-teal-100"
+                      member.role === "owner" ? "bg-blue-100" : "bg-teal-100"
                     }`}
                   >
-                    {member.role === "vendor" ? (
+                    {member.role === "owner" ? (
                       <Store className={`w-5 h-5 text-blue-600`} />
                     ) : (
                       <Users2 className={`w-5 h-5 text-teal-600`} />
@@ -260,7 +238,7 @@ const AdminDashboard = () => {
                 <div className="flex items-center space-x-4">
                   <span
                     className={`px-3 py-1 rounded-full text-sm ${
-                      member.role === "vendor"
+                      member.role === "owner"
                         ? "bg-blue-100 text-blue-800"
                         : "bg-teal-100 text-teal-800"
                     }`}
@@ -275,6 +253,14 @@ const AdminDashboard = () => {
               </div>
             ))
           )}
+        </div>
+        {/* Pagination */}
+        <div className="flex justify-center mt-6">
+          <Pagination
+            currentPage={currentPage}
+            onPageChange={goToPage}
+            totalPages={totalPages}
+          />
         </div>
       </section>
     </div>

@@ -1,52 +1,55 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Shield, Clock } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { supabase } from '../lib/supabase';
-import { toast } from 'react-hot-toast';
-import type { SubscriptionPlan } from '../types';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, CreditCard, Shield, Clock } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { supabase } from "../lib/supabase";
+import { toast } from "react-hot-toast";
+import type { SubscriptionPlan } from "../types";
 
-const SUBSCRIPTION_PLANS: Record<SubscriptionPlan['id'], Omit<SubscriptionPlan, 'id'>> = {
+const SUBSCRIPTION_PLANS: Record<
+  SubscriptionPlan["id"],
+  Omit<SubscriptionPlan, "id">
+> = {
   essential: {
-    name: 'Essential Listing',
+    name: "Essential Listing",
     price: 29,
     yearlyPrice: 290,
-    description: 'Get found and start booking clients',
+    description: "Get found and start booking clients",
     features: [
-      'Standard Listing in Vendor Directory',
-      'Appear in Relevant Search Results',
-      'Contact Requests from Interested Clients',
-      'Access to Basic Analytics'
-    ]
+      "Standard Listing in Vendor Directory",
+      "Appear in Relevant Search Results",
+      "Contact Requests from Interested Clients",
+      "Access to Basic Analytics",
+    ],
   },
   featured: {
-    name: 'Featured Listing',
+    name: "Featured Listing",
     price: 59,
     yearlyPrice: 590,
-    description: 'Stand out and get more leads',
+    description: "Stand out and get more leads",
     features: [
-      'Everything in Essential Listing',
-      'Priority Placement in Search Results',
-      'Featured Badge',
-      'Lead Boost',
-      'Enhanced Profile'
-    ]
+      "Everything in Essential Listing",
+      "Priority Placement in Search Results",
+      "Featured Badge",
+      "Lead Boost",
+      "Enhanced Profile",
+    ],
   },
   elite: {
-    name: 'Elite Listing',
+    name: "Elite Listing",
     price: 99,
     yearlyPrice: 990,
-    description: 'Maximum exposure & premium leads',
-    badge: 'Most Popular',
+    description: "Maximum exposure & premium leads",
+    badge: "Most Popular",
     features: [
-      'Everything in Featured Listing',
-      'Top Placement on Homepage & Search',
-      'Exclusive Vendor Spotlight',
-      'Verified Vendor Badge',
-      'Instant Lead Notifications',
-      'Advanced Analytics & Insights'
-    ]
-  }
+      "Everything in Featured Listing",
+      "Top Placement on Homepage & Search",
+      "Exclusive Vendor Spotlight",
+      "Verified Vendor Badge",
+      "Instant Lead Notifications",
+      "Advanced Analytics & Insights",
+    ],
+  },
 };
 
 const Checkout = () => {
@@ -55,8 +58,8 @@ const Checkout = () => {
   const [loading, setLoading] = useState(true);
   const [vendor, setVendor] = useState<any>(null);
 
-  const planId = searchParams.get('plan') as SubscriptionPlan['id'];
-  const isAnnual = searchParams.get('billing') === 'annual';
+  const planId = searchParams.get("plan") as SubscriptionPlan["id"];
+  const isAnnual = searchParams.get("billing") === "annual";
 
   const plan = planId ? SUBSCRIPTION_PLANS[planId] : null;
   const price = isAnnual ? plan?.yearlyPrice : plan?.price;
@@ -64,24 +67,26 @@ const Checkout = () => {
   useEffect(() => {
     const loadVendorData = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) {
-          toast.error('Please sign in to continue');
-          navigate('/vendor/register');
+          toast.error("Please sign in to continue");
+          navigate("/owner/register");
           return;
         }
 
         const { data: vendorData, error } = await supabase
-          .from('vendors')
-          .select('*')
-          .eq('user_id', user.id)
+          .from("vendors")
+          .select("*")
+          .eq("user_id", user.id)
           .single();
 
         if (error) throw error;
         setVendor(vendorData);
       } catch (error) {
-        console.error('Error loading vendor data:', error);
-        toast.error('Failed to load vendor data');
+        console.error("Error loading vendor data:", error);
+        toast.error("Failed to load vendor data");
       } finally {
         setLoading(false);
       }
@@ -103,8 +108,10 @@ const Checkout = () => {
       <div className="max-w-3xl mx-auto py-12 px-4">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Invalid Plan Selected</h1>
-          <p className="text-gray-600 mb-6">Please select a valid subscription plan.</p>
-          <Button onClick={() => navigate('/subscription')}>View Plans</Button>
+          <p className="text-gray-600 mb-6">
+            Please select a valid subscription plan.
+          </p>
+          <Button onClick={() => navigate("/subscription")}>View Plans</Button>
         </div>
       </div>
     );
@@ -113,7 +120,7 @@ const Checkout = () => {
   return (
     <div className="max-w-6xl mx-auto py-12 px-4">
       <button
-        onClick={() => navigate('/subscription')}
+        onClick={() => navigate("/subscription")}
         className="flex items-center text-gray-600 hover:text-gray-900 mb-8"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
@@ -125,7 +132,9 @@ const Checkout = () => {
         <div className="space-y-8">
           <div>
             <h1 className="text-3xl font-bold mb-2">Complete Your Order</h1>
-            <p className="text-gray-600">Review your subscription details below</p>
+            <p className="text-gray-600">
+              Review your subscription details below
+            </p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
@@ -136,7 +145,7 @@ const Checkout = () => {
               </div>
               <div className="text-right">
                 <p className="text-2xl font-bold">${price}</p>
-                <p className="text-gray-600">/{isAnnual ? 'year' : 'month'}</p>
+                <p className="text-gray-600">/{isAnnual ? "year" : "month"}</p>
               </div>
             </div>
 
@@ -155,7 +164,8 @@ const Checkout = () => {
             {isAnnual && (
               <div className="bg-primary/5 rounded-lg p-4">
                 <p className="text-primary font-medium">
-                  You save ${(plan.price * 12 - plan.yearlyPrice).toFixed(2)} with annual billing
+                  You save ${(plan.price * 12 - plan.yearlyPrice).toFixed(2)}{" "}
+                  with annual billing
                 </p>
               </div>
             )}
@@ -186,12 +196,12 @@ const Checkout = () => {
           <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
             <div className="space-y-4">
               <h3 className="text-xl font-semibold">Payment Summary</h3>
-              
+
               <div className="flex justify-between py-3 border-b">
                 <span className="text-gray-600">Subtotal</span>
                 <span className="font-medium">${price}</span>
               </div>
-              
+
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
                 <span>${price}</span>
@@ -200,7 +210,13 @@ const Checkout = () => {
 
             <Button
               className="w-full h-12 text-lg"
-              onClick={() => navigate(`/subscription/process?plan=${planId}&billing=${isAnnual ? 'annual' : 'monthly'}`)}
+              onClick={() =>
+                navigate(
+                  `/subscription/process?plan=${planId}&billing=${
+                    isAnnual ? "annual" : "monthly"
+                  }`
+                )
+              }
             >
               <CreditCard className="w-5 h-5 mr-2" />
               Proceed to Payment

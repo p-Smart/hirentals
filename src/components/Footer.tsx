@@ -10,8 +10,6 @@ import {
 } from "lucide-react";
 
 const Footer = () => {
-  const navigate = useNavigate();
-
   return (
     <footer className="bg-white border-t mt-20">
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -53,7 +51,7 @@ const Footer = () => {
                   to="/vendors"
                   className="text-gray-600 hover:text-primary"
                 >
-                  Find Vendors
+                  Find Items
                 </Link>
               </li>
               <li>

@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, Search, MessageSquare, UserCircle, Bell, Home } from "lucide-react";
+import {
+  Heart,
+  Search,
+  MessageSquare,
+  UserCircle,
+  Bell,
+  Home,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { supabase } from "../lib/supabase";
 
@@ -206,7 +213,7 @@ const Navbar = () => {
               className="flex items-center space-x-1 text-gray-600 hover:text-gray-900"
             >
               <Search className="w-4 h-4" />
-              <span>Find Vendors</span>
+              <span>Find Items</span>
             </Link>
             {userRole && (
               <>

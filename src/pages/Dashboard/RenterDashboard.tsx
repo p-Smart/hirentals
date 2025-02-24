@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { toast } from "react-hot-toast";
+import { getAuth, signOut } from "firebase/auth";
 
 interface Review {
   id: string;
@@ -112,9 +113,15 @@ const RenterDashboard: React.FC<RenterDashboardProps> = ({ renter }) => {
     content: "",
   });
 
-  const handleLogout = () => {
-    toast.success("Logged out successfully");
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+      toast.success("Logged out successfully");
+      navigate("/");
+    } catch (err) {
+      toast.error("Failed to log out");
+    }
   };
 
   const handleEditReview = (review: Review) => {
@@ -167,7 +174,7 @@ const RenterDashboard: React.FC<RenterDashboardProps> = ({ renter }) => {
           <p className="text-gray-600">Manage your rentals</p>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={() => navigate("/settings")}>
+          <Button variant="outline">
             <Settings className="w-4 h-4 mr-2" />
             Settings
           </Button>
@@ -185,24 +192,21 @@ const RenterDashboard: React.FC<RenterDashboardProps> = ({ renter }) => {
             icon: <Calendar className="w-6 h-6 text-teal-500" />,
             label: "Days Until Next Rental",
             value: "5",
-            onClick: () => navigate("/calendar"),
           },
           {
             icon: <MessageSquare className="w-6 h-6 text-teal-500" />,
             label: "Item Inquiries",
             value: inquiries.length,
-            onClick: () => navigate("/messages"),
           },
           {
             icon: <Home className="w-6 h-6 text-teal-500" />,
             label: "Saved Items",
             value: savedItemsCount,
-            onClick: () => navigate("/saved-items"),
           },
         ].map((stat) => (
           <button
             key={stat.label}
-            onClick={stat.onClick}
+            // onClick={stat.onClick}
             className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow text-left w-full"
           >
             <div className="flex items-center space-x-4">

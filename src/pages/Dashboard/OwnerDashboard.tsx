@@ -7,6 +7,7 @@ import {
   Star,
   GitPullRequest,
   ShoppingCart,
+  Upload,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { toast } from "react-hot-toast";
@@ -164,6 +165,18 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ owner }) => {
             </div>
           </button>
         ))}
+      </div>
+
+      {/* Upload Item Button */}
+      <div className="flex justify-center mt-6">
+        <Button
+          size="lg"
+          className="flex items-center gap-2"
+          onClick={() => navigate("/upload-item")}
+        >
+          <Upload className="w-5 h-5" />
+          Upload Item
+        </Button>
       </div>
 
       {/* Appointments */}

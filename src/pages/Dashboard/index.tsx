@@ -1,48 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import OwnerDashboard from "./OwnerDashboard";
 import RenterDashboard from "./RenterDashboard";
+import { getAuth } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
-  const [userType, setUserType] = useState<"owner" | "renter" | null>(null);
+  const [role, setRole] = useState<"owner" | "renter" | null>(null);
   const [userData, setUserData] = useState<any>(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        // Simulate API call to get user data
-        setTimeout(() => {
-          const user = {
-            id: "1",
-            fullName: "John Doe",
-            userType: "owner",
-          };
+        const auth = getAuth();
+        if (!auth.currentUser) {
+          navigate("/signin");
+          return;
+        }
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
 
-          if (user.userType === "owner") {
-            setUserType("owner");
-            setUserData({
-              id: user.id,
-              fullName: user.fullName,
-              subscription_plan: "Premium",
-              subscription_end_date: "2023-12-31",
-            });
-          } else {
-            setUserType("renter");
-            setUserData({
-              id: user.id,
-              fullName: user.fullName,
-              address: "123 Main St, Anytown, USA",
-            });
-          }
-
-          setLoading(false);
-        }, 1000);
-      } catch (error) {
-        console.error("Error loading user data:", error);
-        toast.error("Failed to load user data");
+        if (userDoc.exists()) {
+          const user = userDoc.data();
+          setUserData(user);
+          setRole(user.role);
+        } else {
+          throw new Error("User not found");
+        }
+      } catch (err) {
+        toast.error(err.message);
+      } finally {
         setLoading(false);
       }
     };
@@ -58,11 +50,11 @@ const Dashboard = () => {
     );
   }
 
-  if (!userData || !userType) {
+  if (!userData || !role) {
     return null;
   }
 
-  return userType === "owner" ? (
+  return role === "owner" ? (
     <OwnerDashboard owner={userData} />
   ) : (
     <RenterDashboard renter={userData} />

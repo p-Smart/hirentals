@@ -23,6 +23,15 @@ interface RecentMember {
   };
 }
 
+interface Appointment {
+  id: string;
+  item: string;
+  date: string;
+  time: string;
+  ownerName: string;
+  calendlyLink: string;
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -105,6 +114,33 @@ const AdminDashboard = () => {
       role: "renter",
       created_at: "2023-10-10T16:30:00Z",
       details: { fullName: "Hank Irving" },
+    },
+  ];
+
+  const dummyAppointments: Appointment[] = [
+    {
+      id: "1",
+      item: "LG Refrigerator",
+      date: "2023-10-15",
+      time: "10:00 AM",
+      ownerName: "John Doe",
+      calendlyLink: "https://calendly.com/admin/meeting-1",
+    },
+    {
+      id: "2",
+      item: "Samsung TV",
+      date: "2023-10-16",
+      time: "2:00 PM",
+      ownerName: "Alice Johnson",
+      calendlyLink: "https://calendly.com/admin/meeting-2",
+    },
+    {
+      id: "3",
+      item: "Microwave Oven",
+      date: "2023-10-17",
+      time: "11:00 AM",
+      ownerName: "Charlie Davis",
+      calendlyLink: "https://calendly.com/admin/meeting-3",
     },
   ];
 
@@ -203,6 +239,43 @@ const AdminDashboard = () => {
           </button>
         ))}
       </div>
+
+      {/* Upcoming Appointments */}
+      <section className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Upcoming Appointments</h2>
+        <div className="space-y-4">
+          {dummyAppointments.length === 0 ? (
+            <p className="text-gray-600 text-center py-4">
+              No upcoming appointments
+            </p>
+          ) : (
+            dummyAppointments.map((appointment) => (
+              <div
+                key={appointment.id}
+                className="flex items-center justify-between py-3 border-b last:border-0"
+              >
+                <div>
+                  <p className="font-medium">{appointment.item}</p>
+                  <p className="text-sm text-gray-600">
+                    {appointment.date} at {appointment.time}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Owner: {appointment.ownerName}
+                  </p>
+                </div>
+                <a
+                  href={appointment.calendlyLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-teal-600 hover:underline"
+                >
+                  View on Calendly
+                </a>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
 
       {/* Recent Activity */}
       <section className="bg-white rounded-lg shadow-sm p-6">

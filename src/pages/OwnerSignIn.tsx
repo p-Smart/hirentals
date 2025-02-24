@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Store } from "lucide-react";
+import { Eye, EyeOff, Store } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { auth } from "../firebase/firebase";
+import { auth, db } from "../firebase/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-hot-toast";
+import { doc, getDoc } from "firebase/firestore";
 
 const OwnerSignIn = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -38,11 +40,21 @@ const OwnerSignIn = () => {
         return;
       }
 
+      const userDocRef = doc(db, "users", auth.currentUser.uid);
+      const userDoc = await getDoc(userDocRef);
+      const userData = userDoc.data();
+
+      if (userData.role !== "owner") {
+        await auth.signOut();
+        throw new Error(
+          `This email is associated with a ${userData.role} account. Please use the correct sign-in page.`
+        );
+      }
+
       toast.success("Signed in successfully!");
       navigate("/dashboard");
-    } catch (error: any) {
-      console.error("Sign in error:", error);
-      toast.error("Failed to sign in");
+    } catch (error) {
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -87,15 +99,29 @@ const OwnerSignIn = () => {
             >
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                required
+                minLength={6}
+                value={formData.password}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>

@@ -42,18 +42,11 @@ const Navbar = () => {
       }
 
       // Check if user is an owner
-      const ownerDoc = await getDoc(doc(db, "owners", user.uid));
-      if (ownerDoc.exists()) {
-        setUserRole("owner");
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setUserRole(userData.role);
         loadOwnerNotifications(user.uid);
-        return;
-      }
-
-      // Check if user is a renter
-      const renterDoc = await getDoc(doc(db, "renters", user.uid));
-      if (renterDoc.exists()) {
-        setUserRole("renter");
-        loadRenterNotifications(user.uid);
         return;
       }
 

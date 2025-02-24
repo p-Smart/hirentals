@@ -25,6 +25,7 @@ import OwnerSignIn from "./pages/OwnerSignIn";
 import ItemSearch from "./pages/ItemSearch";
 import ItemDetail from "./pages/ItemDetail";
 import ItemRequests from "./pages/ItemRequests";
+import UploadItem from "./pages/UploadItem";
 
 function App() {
   return (
@@ -55,6 +56,8 @@ function App() {
             <Route path="/renter/signin" element={<RenterSignIn />} />
 
             <Route path="/item-requests" element={<ItemRequests />} />
+
+            <Route path="/upload-item" element={<UploadItem />} />
 
             {/* Public Admin Dashboard */}
             <Route path="/admin/dashboard" element={<AdminDashboard />} />

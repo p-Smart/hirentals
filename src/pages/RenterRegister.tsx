@@ -2,17 +2,16 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { auth, db } from "../firebase/firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { Button } from "../components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 
 const RenterRegister = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isSignIn, setIsSignIn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -32,52 +31,32 @@ const RenterRegister = () => {
     setLoading(true);
 
     try {
-      if (isSignIn) {
-        // Sign in existing user
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          formData.email,
-          formData.password
-        );
-        const user = userCredential.user;
+      // Create new user
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      const user = userCredential.user;
 
-        if (!user) {
-          toast.error("No user data returned");
-          setLoading(false);
-          return;
-        }
-
-        toast.success("Signed in successfully!");
-        navigate("/dashboard");
-      } else {
-        // Create new user
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          formData.email,
-          formData.password
-        );
-        const user = userCredential.user;
-
-        if (!user) {
-          toast.error("No user data returned");
-          setLoading(false);
-          return;
-        }
-
-        // Create renter profile
-        await setDoc(doc(db, "renters", user.uid), {
-          fullName: formData.fullName,
-          address: formData.address,
-        });
-
-        toast.success(
-          "Registration successful! Please check your email to verify your account."
-        );
-        navigate("/dashboard");
+      if (!user) {
+        toast.error("No user data returned");
+        setLoading(false);
+        return;
       }
-    } catch (error: any) {
-      console.error("Authentication error:", error);
-      toast.error("An unexpected error occurred. Please try again.");
+
+      // Create renter profile
+      await setDoc(doc(db, "users", user.uid), {
+        fullName: formData.fullName,
+        email: formData.email,
+        address: formData.address,
+        role: "renter",
+      });
+
+      toast.success("Registration successful! Please sign in to continue.");
+      navigate("/renter/signin");
+    } catch (err) {
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -122,16 +101,29 @@ const RenterRegister = () => {
               >
                 Password
               </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                required
-                minLength={6}
-                value={formData.password}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  required
+                  minLength={6}
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {!isSignIn && (

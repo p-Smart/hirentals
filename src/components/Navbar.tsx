@@ -174,7 +174,7 @@ const Navbar = () => {
 
           <div className="hidden md:flex items-center space-x-8">
             <Link
-              to="/vendors"
+              to="/items"
               className="flex items-center space-x-1 text-gray-600 hover:text-gray-900"
             >
               <Search className="w-4 h-4" />

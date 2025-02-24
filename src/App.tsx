@@ -3,8 +3,6 @@ import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import VendorSearch from "./pages/VendorSearch";
-import VendorProfile from "./pages/VendorProfile";
 import Dashboard from "./pages/Dashboard";
 import VendorSubscription from "./pages/VendorSubscription";
 import Messages from "./pages/Messages";
@@ -24,6 +22,8 @@ import RenterSignIn from "./pages/RenterSignIn";
 import RenterRegister from "./pages/RenterRegister";
 import OwnerRegister from "./pages/OwnerRegister";
 import OwnerSignIn from "./pages/OwnerSignIn";
+import ItemSearch from "./pages/ItemSearch";
+import ItemDetail from "./pages/ItemDetail";
 
 function App() {
   return (
@@ -33,8 +33,8 @@ function App() {
         <main className="container mx-auto px-4 py-8 flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/vendors" element={<VendorSearch />} />
-            <Route path="/vendors/:id" element={<VendorProfile />} />
+            <Route path="/items" element={<ItemSearch />} />
+            <Route path="/items/:id" element={<ItemDetail />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/subscription" element={<VendorSubscription />} />
             <Route path="/subscription/checkout" element={<Checkout />} />

@@ -40,7 +40,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <Link
-                  to="/vendors"
+                  to="/items"
                   className="text-gray-600 hover:text-primary"
                 >
                   Find Items
@@ -85,14 +85,14 @@ const Footer = () => {
                   List Your Items
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/subscription"
                   className="text-gray-600 hover:text-primary"
                 >
                   Pricing Plans
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   to="/owner/dashboard"

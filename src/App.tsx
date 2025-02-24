@@ -24,6 +24,7 @@ import OwnerRegister from "./pages/OwnerRegister";
 import OwnerSignIn from "./pages/OwnerSignIn";
 import ItemSearch from "./pages/ItemSearch";
 import ItemDetail from "./pages/ItemDetail";
+import ItemRequests from "./pages/ItemRequests";
 
 function App() {
   return (
@@ -52,6 +53,8 @@ function App() {
             <Route path="/owner/signin" element={<OwnerSignIn />} />
             <Route path="/renter/register" element={<RenterRegister />} />
             <Route path="/renter/signin" element={<RenterSignIn />} />
+
+            <Route path="/item-requests" element={<ItemRequests />} />
 
             {/* Public Admin Dashboard */}
             <Route path="/admin/dashboard" element={<AdminDashboard />} />

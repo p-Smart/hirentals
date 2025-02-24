@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Calendar,
   MessageSquare,
-  Heart,
   Settings,
   LogOut,
   Star,
   Pencil,
   X,
   Loader2,
-  InboxIcon,
   Home,
 } from "lucide-react";
-import { Button } from "../components/ui/button";
+import { Button } from "../../components/ui/button";
 import { toast } from "react-hot-toast";
 
 interface Review {
@@ -39,15 +37,6 @@ interface Inquiry {
   status: "pending" | "responded" | "booked";
 }
 
-interface OwnerDashboardProps {
-  owner: {
-    id: string;
-    fullName: string;
-    subscription_plan?: string;
-    subscription_end_date?: string;
-  };
-}
-
 interface RenterDashboardProps {
   renter: {
     id: string;
@@ -55,139 +44,6 @@ interface RenterDashboardProps {
     address: string;
   };
 }
-
-const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ owner }) => {
-  const navigate = useNavigate();
-  const [appointmentsCount, setAppointmentsCount] = useState(5);
-  const [unreadMessages, setUnreadMessages] = useState(3);
-  const [profileViews, setProfileViews] = useState(20);
-  const [pendingLeads, setPendingLeads] = useState(4);
-
-  const handleLogout = () => {
-    toast.success("Logged out successfully");
-    navigate("/");
-  };
-
-  useEffect(() => {
-    // Check for successful subscription
-    const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get("session_id");
-    if (sessionId) {
-      toast.success("Subscription activated successfully!");
-    }
-  }, []);
-
-  return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Welcome, {owner.fullName}!
-          </h1>
-          <p className="text-gray-600">Manage your rental items</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={() => navigate("/reviews")}>
-            <Star className="w-4 h-4 mr-2" />
-            Reviews
-          </Button>
-          <Button variant="outline" onClick={() => navigate("/leads")}>
-            <InboxIcon className="w-4 h-4 mr-2" />
-            Leads
-          </Button>
-          <Button variant="outline" onClick={() => navigate("/owner/settings")}>
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </Button>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="w-4 h-4 mr-2" />
-            Log Out
-          </Button>
-        </div>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {[
-          {
-            icon: <Calendar className="w-6 h-6 text-teal-500" />,
-            label: "Upcoming Appointments",
-            value: appointmentsCount.toString(),
-            onClick: () => navigate("/calendar"),
-          },
-          {
-            icon: <MessageSquare className="w-6 h-6 text-teal-500" />,
-            label: "Unread Messages",
-            value: unreadMessages.toString(),
-            onClick: () => navigate("/messages"),
-          },
-          {
-            icon: <InboxIcon className="w-6 h-6 text-teal-500" />,
-            label: "Pending Leads",
-            value: pendingLeads.toString(),
-            onClick: () => navigate("/leads"),
-          },
-          {
-            icon: <Home className="w-6 h-6 text-teal-500" />,
-            label: "Profile Views",
-            value: profileViews.toString(),
-            onClick: () => navigate(`/owners/${owner.id}`),
-          },
-        ].map((stat) => (
-          <button
-            key={stat.label}
-            onClick={stat.onClick}
-            className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow text-left w-full"
-          >
-            <div className="flex items-center space-x-4">
-              {stat.icon}
-              <div>
-                <p className="text-gray-600">{stat.label}</p>
-                <p className="text-2xl font-semibold">{stat.value}</p>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* Recent Activity */}
-      <section className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-        <div className="space-y-4">
-          {[
-            {
-              type: "booking",
-              title: "New booking request from Sarah",
-              time: "2 hours ago",
-            },
-            {
-              type: "message",
-              title: "New message from Emma",
-              time: "5 hours ago",
-            },
-            {
-              type: "review",
-              title: "New 5-star review received",
-              time: "1 day ago",
-            },
-          ].map((activity, index) => (
-            <div
-              key={index}
-              className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg"
-            >
-              <div className="w-2 h-2 rounded-full bg-teal-500" />
-              <div className="flex-1">
-                <p className="font-medium">{activity.title}</p>
-                <p className="text-sm text-gray-600">{activity.time}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-};
 
 const RenterDashboard: React.FC<RenterDashboardProps> = ({ renter }) => {
   const navigate = useNavigate();
@@ -558,69 +414,4 @@ const RenterDashboard: React.FC<RenterDashboardProps> = ({ renter }) => {
   );
 };
 
-const Dashboard = () => {
-  const [loading, setLoading] = useState(true);
-  const [userType, setUserType] = useState<"owner" | "renter" | null>(null);
-  const [userData, setUserData] = useState<any>(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        // Simulate API call to get user data
-        setTimeout(() => {
-          const user = {
-            id: "1",
-            fullName: "John Doe",
-            userType: "renter",
-          };
-
-          if (user.userType === "owner") {
-            setUserType("owner");
-            setUserData({
-              id: user.id,
-              fullName: user.fullName,
-              subscription_plan: "Premium",
-              subscription_end_date: "2023-12-31",
-            });
-          } else {
-            setUserType("renter");
-            setUserData({
-              id: user.id,
-              fullName: user.fullName,
-              address: "123 Main St, Anytown, USA",
-            });
-          }
-
-          setLoading(false);
-        }, 1000);
-      } catch (error) {
-        console.error("Error loading user data:", error);
-        toast.error("Failed to load user data");
-        setLoading(false);
-      }
-    };
-
-    loadUserData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-600">Loading dashboard...</p>
-      </div>
-    );
-  }
-
-  if (!userData || !userType) {
-    return null;
-  }
-
-  return userType === "owner" ? (
-    <OwnerDashboard owner={userData} />
-  ) : (
-    <RenterDashboard renter={userData} />
-  );
-};
-
-export default Dashboard;
+export default RenterDashboard;

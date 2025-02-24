@@ -23,7 +23,7 @@ interface Notification {
     | "review"
     | "owner_response"
     | "booking_confirmation";
-  entityId?: string; // ID of the related entity (booking, message, etc.)
+  entityId?: string;
 }
 
 const Navbar = () => {

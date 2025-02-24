@@ -7,11 +7,15 @@ import {
   Filter,
   CheckCircle,
   XCircle,
+  Plus,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import Pagination from "../components/Pagination";
 import usePagination from "../hooks/usePagination";
 import items from "../dummy/items";
+import { db } from "../firebase/firebase";
+import { collection, addDoc } from "firebase/firestore";
+import Modal from "../components/Modal";
 
 interface Item {
   id: string;
@@ -42,6 +46,13 @@ const ItemSearch = () => {
     rating: "All Ratings",
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestFormData, setRequestFormData] = useState({
+    itemName: "",
+    preferredDuration: "",
+    rentalPriceRange: "",
+    renterName: "",
+  });
 
   const { currentPage, goToPage, totalPages, startIndex, endIndex } =
     usePagination({
@@ -97,6 +108,31 @@ const ItemSearch = () => {
 
       return true;
     });
+  };
+
+  const handleRequestFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setRequestFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRequestFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await addDoc(collection(db, "item_requests"), requestFormData);
+      setShowRequestModal(false);
+      setRequestFormData({
+        itemName: "",
+        preferredDuration: "",
+        rentalPriceRange: "",
+        renterName: "",
+      });
+      alert("Item request submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting item request:", error);
+      alert("Failed to submit item request. Please try again.");
+    }
   };
 
   return (
@@ -258,6 +294,21 @@ const ItemSearch = () => {
         </div>
       )}
 
+      {/* Request Item Section */}
+      <div className="flex flex-col items-center space-y-4">
+        <p className="text-gray-600">
+          Could not find what you want? Request Item
+        </p>
+        <Button
+          size="lg"
+          className="flex items-center gap-2"
+          onClick={() => setShowRequestModal(true)}
+        >
+          <Plus className="w-5 h-5" />
+          Request Item
+        </Button>
+      </div>
+
       {/* Results Count */}
       <div className="flex justify-between items-center">
         <p className="text-gray-600">
@@ -347,6 +398,70 @@ const ItemSearch = () => {
           totalPages={totalPages}
         />
       </div>
+
+      {/* Request Item Modal */}
+      {showRequestModal && (
+        <Modal onClose={() => setShowRequestModal(false)}>
+          <h2 className="text-2xl font-semibold mb-4">Request Item</h2>
+          <form onSubmit={handleRequestFormSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Item Name
+              </label>
+              <input
+                type="text"
+                name="itemName"
+                value={requestFormData.itemName}
+                onChange={handleRequestFormChange}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Preferred Duration
+              </label>
+              <input
+                type="text"
+                name="preferredDuration"
+                value={requestFormData.preferredDuration}
+                onChange={handleRequestFormChange}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Rental Price Range
+              </label>
+              <input
+                type="text"
+                name="rentalPriceRange"
+                value={requestFormData.rentalPriceRange}
+                onChange={handleRequestFormChange}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Renter Name
+              </label>
+              <input
+                type="text"
+                name="renterName"
+                value={requestFormData.renterName}
+                onChange={handleRequestFormChange}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Submit Request
+            </Button>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 };

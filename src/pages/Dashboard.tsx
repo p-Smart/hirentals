@@ -151,27 +151,6 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ owner }) => {
         ))}
       </div>
 
-      {/* Subscription Status */}
-      <section className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-semibold mb-4">Subscription Status</h2>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium">
-              Current Plan: {owner.subscription_plan || "No active plan"}
-            </p>
-            {owner.subscription_end_date && (
-              <p className="text-sm text-gray-600">
-                Renews on:{" "}
-                {new Date(owner.subscription_end_date).toLocaleDateString()}
-              </p>
-            )}
-          </div>
-          <Button onClick={() => navigate("/subscription")}>
-            {owner.subscription_plan ? "Manage Plan" : "Choose a Plan"}
-          </Button>
-        </div>
-      </section>
-
       {/* Recent Activity */}
       <section className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
@@ -593,7 +572,7 @@ const Dashboard = () => {
           const user = {
             id: "1",
             fullName: "John Doe",
-            userType: "owner",
+            userType: "renter",
           };
 
           if (user.userType === "owner") {
@@ -636,8 +615,6 @@ const Dashboard = () => {
   if (!userData || !userType) {
     return null;
   }
-
-  return <RenterDashboard renter={userData} />;
 
   return userType === "owner" ? (
     <OwnerDashboard owner={userData} />

@@ -15,7 +15,7 @@ const Home = () => {
           rent
         </p>
         <div className="flex flex-col items-center gap-4 md:flex-row md:justify-center">
-          <Link to="/vendors">
+          <Link to="/items">
             <Button size="lg">Start Renting</Button>
           </Link>
           <Link to="/owner/register">

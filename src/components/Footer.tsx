@@ -39,10 +39,7 @@ const Footer = () => {
             <h3 className="font-semibold mb-4">For Renters</h3>
             <ul className="space-y-3">
               <li>
-                <Link
-                  to="/items"
-                  className="text-gray-600 hover:text-primary"
-                >
+                <Link to="/items" className="text-gray-600 hover:text-primary">
                   Find Items
                 </Link>
               </li>
@@ -95,7 +92,7 @@ const Footer = () => {
               </li> */}
               <li>
                 <Link
-                  to="/owner/dashboard"
+                  to="/dashboard"
                   className="text-gray-600 hover:text-primary"
                 >
                   Owner Dashboard
@@ -103,7 +100,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/owner/settings"
+                  to="/settings"
                   className="text-gray-600 hover:text-primary"
                 >
                   Account Settings

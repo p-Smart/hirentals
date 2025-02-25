@@ -3,13 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   Calendar,
   MapPin,
-  DollarSign,
   Star,
-  MessageSquare,
   CheckCircle,
   XCircle,
-  Loader2,
   Plus,
+  Banknote,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { toast } from "react-hot-toast";
@@ -187,7 +185,7 @@ const ItemDetail = () => {
                   <span className="ml-1">{itemData.location}</span>
                 </div>
                 <div className="flex items-center">
-                  <DollarSign className="w-5 h-5" />
+                  <Banknote className="w-5 h-5" />
                   <span className="ml-1">{itemData.rentalPrice}</span>
                 </div>
               </div>

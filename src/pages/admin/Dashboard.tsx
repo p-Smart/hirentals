@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users2, Store, Star, DollarSign, Calendar } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { Users2, Store, Star, Calendar, Banknote } from "lucide-react";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../hooks/usePagination";
 
@@ -40,7 +39,7 @@ const AdminDashboard = () => {
     totalOwners: 50,
     totalRenters: 200,
     totalBookings: 150,
-    totalRevenue: 2000000,
+    totalRevenue: 200000,
     activeListings: 120,
   });
 
@@ -221,7 +220,7 @@ const AdminDashboard = () => {
           {
             label: "Total Revenue",
             value: `₦${stats.totalRevenue.toLocaleString()}`,
-            icon: <DollarSign className="w-8 h-8 text-primary" />,
+            icon: <Banknote className="w-8 h-8 text-primary" />,
           },
         ].map((stat, index) => (
           <button

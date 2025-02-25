@@ -14,8 +14,10 @@ import Pagination from "../components/Pagination";
 import usePagination from "../hooks/usePagination";
 import items from "../dummy/items";
 import { db } from "../firebase/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { addDoc } from "firebase/firestore";
 import Modal from "../components/Modal";
+import { getCollection } from "../firebase/utils";
+import toast from "react-hot-toast";
 
 interface Item {
   id: string;
@@ -117,10 +119,12 @@ const ItemSearch = () => {
     setRequestFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const [rqFormSubmitting, setRqFormSubmitting] = useState(false);
   const handleRequestFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await addDoc(collection(db, "item_requests"), requestFormData);
+      setRqFormSubmitting(true);
+      await addDoc(getCollection(db, "item_requests"), requestFormData);
       setShowRequestModal(false);
       setRequestFormData({
         itemName: "",
@@ -128,10 +132,11 @@ const ItemSearch = () => {
         rentalPriceRange: "",
         renterName: "",
       });
-      alert("Item request submitted successfully!");
-    } catch (error) {
-      console.error("Error submitting item request:", error);
-      alert("Failed to submit item request. Please try again.");
+      toast.success("Item request submitted successfully!");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setRqFormSubmitting(false);
     }
   };
 
@@ -456,8 +461,12 @@ const ItemSearch = () => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
-              Submit Request
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={rqFormSubmitting}
+            >
+              {rqFormSubmitting ? "Submitting Request..." : "Submit Request"}
             </Button>
           </form>
         </Modal>

@@ -6,6 +6,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { Button } from "../components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
+import { getDocument } from "../firebase/utils";
 
 const RenterRegister = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const RenterRegister = () => {
       }
 
       // Create renter profile
-      await setDoc(doc(db, "users", user.uid), {
+      await setDoc(getDocument(db, "users", user.uid), {
         fullName: formData.fullName,
         email: formData.email,
         address: formData.address,

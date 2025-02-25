@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { auth, db } from "../firebase/firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { Button } from "../components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
+import { getDocument } from "../firebase/utils";
 
 const OwnerRegister = () => {
   const navigate = useNavigate();
@@ -50,7 +48,7 @@ const OwnerRegister = () => {
       }
 
       // Create owner profile
-      await setDoc(doc(db, "users", user.uid), {
+      await setDoc(getDocument(db, "users", user.uid), {
         fullName: formData.fullName,
         email: formData.email,
         address: formData.address,

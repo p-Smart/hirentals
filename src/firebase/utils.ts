@@ -1,35 +1,25 @@
 import {
-  FirestoreDataConverter,
-  Timestamp,
-  DocumentSnapshot,
-  WithFieldValue,
-  serverTimestamp,
+  Firestore,
+  CollectionReference,
+  DocumentReference,
+  collection,
+  doc,
 } from "firebase/firestore";
+import dbInterceptor from "./db-interceptor";
 
-export const dataConverter: FirestoreDataConverter<any> = {
-  toFirestore(data: WithFieldValue<any>) {
-    return {
-      ...data,
-      created_at:
-        data.created_at instanceof Date
-          ? Timestamp.fromDate(data.created_at)
-          : data.created_at,
-      updated_at: serverTimestamp(),
-    };
-  },
-  fromFirestore(snapshot: DocumentSnapshot) {
-    const data = snapshot.data() || {};
-    return {
-      ...data,
-      id: snapshot.id,
-      created_at:
-        data.created_at instanceof Timestamp
-          ? data.created_at.toDate()
-          : data.created_at,
-      updated_at:
-        data.updated_at instanceof Timestamp
-          ? data.updated_at.toDate()
-          : data.updated_at,
-    };
-  },
+export const getCollection = <T>(
+  db: Firestore,
+  path: string
+): CollectionReference<T> => {
+  return collection(db, path).withConverter(dbInterceptor);
+};
+
+export const getDocument = <T>(
+  db: Firestore,
+  path: string,
+  id?: string
+): DocumentReference<T> => {
+  return id
+    ? doc(db, path, id).withConverter(dbInterceptor)
+    : doc(db, path).withConverter(dbInterceptor);
 };

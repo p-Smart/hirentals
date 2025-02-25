@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { toast } from "react-hot-toast";
+import Modal from "../components/Modal";
+import { PaystackButton } from "react-paystack";
 
 interface Review {
   id: string;
@@ -92,6 +94,15 @@ const ItemDetail = () => {
   const [loading, setLoading] = useState(true);
   const [itemData, setItemData] = useState<Item | null>(null);
   const [reviews, setReviews] = useState<Review[]>(dummyReviews);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [newReview, setNewReview] = useState({
+    rating: 0,
+    content: "",
+    reviewer: {
+      name: "",
+    },
+  });
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   useEffect(() => {
     loadItemData();
@@ -109,6 +120,29 @@ const ItemDetail = () => {
       toast.error("Failed to load item details");
       setLoading(false);
     }
+  };
+
+  const handleAddReview = () => {
+    const newReviewData = {
+      ...newReview,
+      id: (reviews.length + 1).toString(),
+      created_at: new Date().toISOString(),
+    };
+    setReviews((prev) => [...prev, newReviewData]);
+    setShowReviewModal(false);
+    setNewReview({
+      rating: 0,
+      content: "",
+      reviewer: {
+        name: "",
+      },
+    });
+    toast.success("Review added successfully!");
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false);
+    toast.success("Payment successful! Your booking is confirmed.");
   };
 
   if (loading) {
@@ -161,7 +195,7 @@ const ItemDetail = () => {
             <Button
               variant="outline"
               className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
-              onClick={() => navigate("/book")}
+              onClick={() => setShowPaymentModal(true)}
             >
               Book Item Now
             </Button>
@@ -209,7 +243,7 @@ const ItemDetail = () => {
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold">Reviews</h2>
-              <Button onClick={() => navigate("/add-review")}>
+              <Button onClick={() => setShowReviewModal(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Review
               </Button>
@@ -291,13 +325,107 @@ const ItemDetail = () => {
           </div>
 
           <div className="bg-white rounded-lg p-6 shadow-sm">
-            <Button className="w-full" onClick={() => navigate("/book")}>
+            <Button
+              className="w-full"
+              onClick={() => setShowPaymentModal(true)}
+            >
               <Calendar className="w-4 h-4 mr-2" />
               Book Item Now
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Add Review Modal */}
+      {showReviewModal && (
+        <Modal onClose={() => setShowReviewModal(false)}>
+          <h2 className="text-2xl font-semibold mb-4">Add Review</h2>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleAddReview();
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Your Name
+              </label>
+              <input
+                type="text"
+                name="reviewerName"
+                value={newReview.reviewer.name}
+                onChange={(e) =>
+                  setNewReview((prev) => ({
+                    ...prev,
+                    reviewer: { ...prev.reviewer, name: e.target.value },
+                  }))
+                }
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Rating
+              </label>
+              <select
+                name="rating"
+                value={newReview.rating}
+                onChange={(e) =>
+                  setNewReview((prev) => ({
+                    ...prev,
+                    rating: parseInt(e.target.value),
+                  }))
+                }
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                required
+              >
+                <option value={0}>Select Rating</option>
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <option key={rating} value={rating}>
+                    {rating} Star{rating > 1 ? "s" : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Review
+              </label>
+              <textarea
+                name="content"
+                value={newReview.content}
+                onChange={(e) =>
+                  setNewReview((prev) => ({ ...prev, content: e.target.value }))
+                }
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                rows={4}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Submit Review
+            </Button>
+          </form>
+        </Modal>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <Modal onClose={() => setShowPaymentModal(false)}>
+          <h2 className="text-2xl font-semibold mb-4">Make Payment</h2>
+          <PaystackButton
+            email="hirental@example.com"
+            amount={2000 * 100} // Amount in kobo
+            publicKey={import.meta.env.VITE_PAYSTACK_PK}
+            text="Pay Now"
+            onSuccess={handlePaymentSuccess}
+            onClose={() => setShowPaymentModal(false)}
+            className="w-full bg-primary text-white py-2 rounded-md mt-4"
+          />
+        </Modal>
+      )}
     </div>
   );
 };

@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
-import { Upload, ArrowLeft, X } from "lucide-react";
-import { useDropzone, Accept } from "react-dropzone";
+import { ArrowLeft, X } from "lucide-react";
+import { useDropzone } from "react-dropzone";
+import { addDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../firebase/firebase";
+import { getCollection } from "../firebase/utils";
+import toast from "react-hot-toast";
 
 interface ItemData {
   name: string;
@@ -77,10 +82,46 @@ const UploadItem = () => {
     multiple: true,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic
-    console.log(itemData);
+
+    try {
+      setLoading(true);
+      // Upload main image
+      let mainImageUrl = "";
+      if (itemData.mainImage) {
+        const mainImageRef = ref(storage, `images/${itemData.mainImage.name}`);
+        await uploadBytes(mainImageRef, itemData.mainImage);
+        mainImageUrl = await getDownloadURL(mainImageRef);
+      }
+
+      // Upload other images
+      const otherImageUrls = await Promise.all(
+        itemData.otherImages.map(async (file) => {
+          const imageRef = ref(storage, `images/${file.name}`);
+          await uploadBytes(imageRef, file);
+          return await getDownloadURL(imageRef);
+        })
+      );
+
+      // Add item to Firestore
+      await addDoc(getCollection(db, "items"), {
+        ...itemData,
+        mainImage: mainImageUrl,
+        otherImages: otherImageUrls,
+        publishStatus: "pending",
+      });
+
+      toast.success(
+        "Item uploaded successfully!. You will be scheduled for a verification call soon."
+      );
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -274,8 +315,8 @@ const UploadItem = () => {
           </div>
         </div>
 
-        <Button type="submit" className="w-full mt-6">
-          Submit Item
+        <Button type="submit" className="w-full mt-6" disabled={loading}>
+          {loading ? "Uploading..." : "Submit Item"}
         </Button>
       </form>
     </div>

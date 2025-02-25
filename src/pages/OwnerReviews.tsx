@@ -1,120 +1,138 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Star, MessageSquare, Calendar } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { supabase } from "../lib/supabase";
-import { toast } from "react-hot-toast";
 
 interface Review {
   id: string;
   rating: number;
   content: string;
   created_at: string;
+  reviewer: {
+    name: string;
+  };
   response?: string | null;
   response_date?: string | null;
-  couple?: {
-    partner1_name: string;
-    partner2_name: string;
-  } | null;
 }
 
-const VendorReviews = () => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [reviews, setReviews] = useState<Review[]>([]);
+const dummyReviews: Review[] = [
+  {
+    id: "1",
+    rating: 5,
+    content: "Great experience renting this item!",
+    created_at: "2023-10-01T12:00:00Z",
+    reviewer: {
+      name: "Alice Johnson",
+    },
+  },
+  {
+    id: "2",
+    rating: 4,
+    content: "The item was in good condition.",
+    created_at: "2023-10-02T14:30:00Z",
+    reviewer: {
+      name: "Bob Brown",
+    },
+  },
+  {
+    id: "3",
+    rating: 3,
+    content: "Average experience.",
+    created_at: "2023-10-03T09:45:00Z",
+    reviewer: {
+      name: "Charlie Davis",
+    },
+  },
+  {
+    id: "4",
+    rating: 5,
+    content: "Excellent service and item quality!",
+    created_at: "2023-10-04T11:00:00Z",
+    reviewer: {
+      name: "Diana Evans",
+    },
+  },
+  {
+    id: "5",
+    rating: 2,
+    content: "Not satisfied with the item condition.",
+    created_at: "2023-10-05T08:15:00Z",
+    reviewer: {
+      name: "Eve Foster",
+    },
+  },
+  {
+    id: "6",
+    rating: 4,
+    content: "Good experience overall.",
+    created_at: "2023-10-06T10:45:00Z",
+    reviewer: {
+      name: "Frank Green",
+    },
+  },
+  {
+    id: "7",
+    rating: 5,
+    content: "Highly recommend this service!",
+    created_at: "2023-10-07T09:30:00Z",
+    reviewer: {
+      name: "Grace Harris",
+    },
+  },
+  {
+    id: "8",
+    rating: 3,
+    content: "It was okay, nothing special.",
+    created_at: "2023-10-08T12:45:00Z",
+    reviewer: {
+      name: "Hank Irving",
+    },
+  },
+  {
+    id: "9",
+    rating: 4,
+    content: "Very good service and item.",
+    created_at: "2023-10-09T14:00:00Z",
+    reviewer: {
+      name: "Ivy Jackson",
+    },
+  },
+  {
+    id: "10",
+    rating: 5,
+    content: "Fantastic experience!",
+    created_at: "2023-10-10T16:30:00Z",
+    reviewer: {
+      name: "Jack King",
+    },
+  },
+];
+
+const OwnerReviews = () => {
+  const [reviews, setReviews] = useState<Review[]>(dummyReviews);
   const [responding, setResponding] = useState<string | null>(null);
   const [response, setResponse] = useState("");
 
-  useEffect(() => {
-    loadReviews();
-  }, []);
-
-  const loadReviews = async () => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/owner/signin");
-        return;
-      }
-
-      // Get vendor ID
-      const { data: vendorData } = await supabase
-        .from("vendors")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!vendorData) {
-        toast.error("Vendor profile not found");
-        return;
-      }
-
-      // Get reviews with couple details
-      const { data: reviewsData, error } = await supabase
-        .from("reviews")
-        .select(
-          `
-          *,
-          couple:couples (
-            partner1_name,
-            partner2_name
-          )
-        `
-        )
-        .eq("vendor_id", vendorData.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      // Filter out reviews with null couple data
-      const validReviews = reviewsData?.filter((review) => review.couple) || [];
-      setReviews(validReviews);
-    } catch (error) {
-      console.error("Error loading reviews:", error);
-      toast.error("Failed to load reviews");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmitResponse = async (reviewId: string) => {
+  const handleSubmitResponse = (reviewId: string) => {
     if (!response.trim()) {
-      toast.error("Please enter a response");
+      alert("Please enter a response");
       return;
     }
 
-    try {
-      const { error } = await supabase
-        .from("reviews")
-        .update({
-          response: response.trim(),
-          response_date: new Date().toISOString(),
-        })
-        .eq("id", reviewId);
+    setReviews((prev) =>
+      prev.map((review) =>
+        review.id === reviewId
+          ? {
+              ...review,
+              response: response.trim(),
+              response_date: new Date().toISOString(),
+            }
+          : review
+      )
+    );
 
-      if (error) throw error;
-
-      setReviews((prev) =>
-        prev.map((review) =>
-          review.id === reviewId
-            ? {
-                ...review,
-                response: response.trim(),
-                response_date: new Date().toISOString(),
-              }
-            : review
-        )
-      );
-
-      setResponding(null);
-      setResponse("");
-      toast.success("Response posted successfully");
-    } catch (error) {
-      console.error("Error posting response:", error);
-      toast.error("Failed to post response");
-    }
+    setResponding(null);
+    setResponse("");
+    alert("Response posted successfully");
   };
 
   const getAverageRating = () => {
@@ -122,14 +140,6 @@ const VendorReviews = () => {
     const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
     return (sum / reviews.length).toFixed(1);
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-600">Loading reviews...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4">
@@ -184,7 +194,7 @@ const VendorReviews = () => {
             <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">No reviews yet</h2>
             <p className="text-gray-600">
-              When couples review your services, they'll appear here.
+              When customers review your items, they'll appear here.
             </p>
           </div>
         ) : (
@@ -211,19 +221,14 @@ const VendorReviews = () => {
                         {new Date(review.created_at).toLocaleDateString()}
                       </span>
                     </div>
-                    {review.couple && (
-                      <p className="font-medium mt-1">
-                        {review.couple.partner1_name} &{" "}
-                        {review.couple.partner2_name}
-                      </p>
-                    )}
+                    <p className="font-medium mt-1">{review.reviewer.name}</p>
                   </div>
                 </div>
 
                 {/* Review Content */}
                 <p className="text-gray-600">{review.content}</p>
 
-                {/* Vendor Response */}
+                {/* Owner Response */}
                 {review.response ? (
                   <div className="bg-gray-50 p-4 rounded-lg mt-4">
                     <p className="font-medium mb-2">Your Response</p>
@@ -274,4 +279,4 @@ const VendorReviews = () => {
   );
 };
 
-export default VendorReviews;
+export default OwnerReviews;

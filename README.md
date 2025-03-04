@@ -15,6 +15,8 @@ HiRentals is a web application that connects renters with owners offering a vari
 
 - **React**: Frontend library for building user interfaces.
 - **Firebase**: Backend services for authentication, database, and storage.
+- **Paystack**: Payment gateway for processessing payments.
+- **Calendly**: For scheduling meetings between admins and users.
 - **Tailwind CSS**: Utility-first CSS framework for styling.
 - **React Router**: Library for routing in React applications.
 - **React Hot Toast**: Library for displaying toast notifications.
@@ -43,12 +45,7 @@ HiRentals is a web application that connects renters with owners offering a vari
 3. Create a `.env` file in the root directory and add your Firebase configuration:
 
    ```env
-   REACT_APP_FIREBASE_API_KEY=your-api-key
-   REACT_APP_FIREBASE_AUTH_DOMAIN=your-auth-domain
-   REACT_APP_FIREBASE_PROJECT_ID=your-project-id
-   REACT_APP_FIREBASE_STORAGE_BUCKET=your-storage-bucket
-   REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
-   REACT_APP_FIREBASE_APP_ID=your-app-id
+   VITE_PAYSTACK_PK=KEY
    ```
 
 4. Start the development server:
@@ -95,10 +92,6 @@ hi-rentals/
 
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
 ## Contact
 
-For any questions or inquiries, please contact us at [contact@hirentals.com](mailto:contact@hirentals.com).
+For any questions or inquiries, please contact us at [princeayokunle2002@gmail.com](mailto:princeayokunle2002@gmail.com).

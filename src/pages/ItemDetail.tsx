@@ -44,7 +44,7 @@ interface Item {
 const dummyItem: Item = {
   id: "1",
   image:
-    "https://plus.unsplash.com/premium_photo-1683134584513-db73da8ebc29?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.nappy.co/photo/El_CGRP4urkk0v4iEtjti.jpg?h=750&w=1260&cs=srgb&fm=jpg",
   name: "LG Refrigerator",
   category: "Electronics",
   rentalPrice: "₦500/day",
@@ -59,7 +59,7 @@ const dummyItem: Item = {
   rentalTerms:
     "Please handle the refrigerator with care. Do not overload the shelves or place hot items directly inside. Ensure the refrigerator is kept clean and returned in the same condition as it was rented. Any damages or malfunctions should be reported immediately. The renter is responsible for any repairs or replacements needed due to misuse.",
   images: [
-    "https://plus.unsplash.com/premium_photo-1683134584513-db73da8ebc29?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.nappy.co/photo/El_CGRP4urkk0v4iEtjti.jpg?h=750&w=1260&cs=srgb&fm=jpg",
     "https://th.bing.com/th/id/R.6fa41f6ea123b69ecb4261be8bf680ee?rik=uUVtGOSS3CNnWQ&riu=http%3a%2f%2fimg.bbystatic.com%2fBestBuy_US%2fimages%2fproducts%2f5258%2f5258309_sd.jpg&ehk=ppYIAVslCidjU6ClaJiVid2iPHQSNs9JHhdUaubuPrg%3d&risl=&pid=ImgRaw&r=0",
     "https://th.bing.com/th/id/R.c8166673ce8573fa53a19553545f3a3c?rik=eW4AiFLg76njzQ&riu=http%3a%2f%2fcontent.blueport.com%2fProductImages%2f0%2f437615.jpg%3ffit%3dinside%7c65%3a65%26composite-to%3dcenter%2ccenter%7c65%3a65%26background-color%3dwhite&ehk=7wP28wIbeznydFTg6a9k4ccpCZA29nHXukMbsFJvdqE%3d&risl=&pid=ImgRaw&r=0",
   ],
